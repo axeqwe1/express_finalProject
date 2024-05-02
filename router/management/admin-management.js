@@ -1,0 +1,80 @@
+const express = require('express');
+const sequelize = require('../../db/sequelizeConfig');
+const admin = require('../../db/model/admin')(sequelize);
+const adminRouter = express.Router();
+
+// GET all admins
+adminRouter.get("/getadmins", async (req, res) => {
+    try {
+        const admins = await admin.findAll();
+        res.json(admins);
+    } catch (error) {
+        console.error('Error fetching admins:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// GET admin by ID
+adminRouter.get("/getadmin/:id", async (req, res) => {
+    try {
+        const adminId = parseInt(req.params.id);
+        const adminData = await admin.findByPk(adminId);
+        if (adminData) {
+            res.json(adminData);
+        } else {
+            res.status(404).send('Admin not found');
+        }
+    } catch (error) {
+        console.error('Error fetching admin:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// POST new admin
+adminRouter.post("/addadmin", async (req, res) => {
+    try {
+        const newAdmin = await admin.create(req.body);
+        res.status(201).json(newAdmin);
+    } catch (error) {
+        console.error('Error adding admin:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// PUT update admin
+adminRouter.put("/updateadmin/:id", async (req, res) => {
+    try {
+        const adminId = parseInt(req.params.id);
+        const updatedAdmin = await admin.update(req.body, {
+            where: { admin_id: adminId }
+        });
+        if (updatedAdmin[0] > 0) {
+            res.send('Admin updated successfully');
+        } else {
+            res.status(404).send('Admin not found');
+        }
+    } catch (error) {
+        console.error('Error updating admin:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// DELETE an admin
+adminRouter.delete("/deleteadmin/:id", async (req, res) => {
+    try {
+        const adminId = parseInt(req.params.id);
+        const deletedAdmin = await admin.destroy({
+            where: { admin_id: adminId }
+        });
+        if (deletedAdmin) {
+            res.send('Admin deleted successfully');
+        } else {
+            res.status(404).send('Admin not found');
+        }
+    } catch (error) {
+        console.error('Error deleting admin:', error);
+        res.status(500).send('Server Error');
+    }
+});
+
+module.exports = adminRouter;
