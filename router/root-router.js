@@ -14,7 +14,8 @@ const router = {
         },
     action:
         {
-            
+            requestForRepair:require('./action/requestForRepair_ac'),
+            assignWork:require('./action/assignwork_ac')
         }
 }
 

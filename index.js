@@ -20,7 +20,9 @@ app.use('/managementdata',router.management.equipment)
 app.use('/managementdata',router.management.equipmentType)
 app.use('/managementdata',router.management.levelOfDamage)
 app.use('/managementdata',router.management.technicianStatus)
-
+// action
+app.use('/action',router.action.requestForRepair)
+app.use('/action',router.action.assignWork)
 
 app.get('/test',(req,res) =>{
   res.send("test")
