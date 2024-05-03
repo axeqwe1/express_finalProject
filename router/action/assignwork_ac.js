@@ -1,8 +1,5 @@
 const express = require('express');
 const sequelize = require('../../db/sequelizeConfig');
-const { where } = require('sequelize');
-const { employee } = require('../../db');
-
 // การนำเข้าโมเดลจากไฟล์โมเดลแต่ละไฟล์โดยตรง
 const assignWork = require('../../db/model/assignWork')(sequelize);
 const receiveRepair = require('../../db/model/receiveRepair')(sequelize)
