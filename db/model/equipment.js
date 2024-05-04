@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes,literal } = require("sequelize");
 
 module.exports = ( sequelize ) => {
     const equipment = sequelize.define(
@@ -20,6 +20,11 @@ module.exports = ( sequelize ) => {
           eq_start_date:{
             type:DataTypes.DATE,
             allowNull:false,
+            defaultValue: literal('CURRENT_TIMESTAMP')
+          },
+          eqc_id:{
+            type: DataTypes.INTEGER,
+            allowNull:false
           }
         },
         {

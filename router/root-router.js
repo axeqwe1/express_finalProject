@@ -15,8 +15,10 @@ const router = {
     action:
         {
             requestForRepair:require('./action/requestForRepair_ac'),
-            assignWork:require('./action/assignwork_ac')
-        }
+            assignWork:require('./action/assignwork_ac'),
+            repairDetail:require('./action/repairDetail_ac')
+        },
+
 }
 
 module.exports = router

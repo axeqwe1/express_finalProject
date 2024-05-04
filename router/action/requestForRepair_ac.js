@@ -1,5 +1,5 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
+const sequelize = require('../../db/config/sequelizeConfig');
 const RequestForRepair = require('../../db/model/requestForRepair')(sequelize);
 const Notification = require('../../db/model/notification')(sequelize);
 const Admin = require('../../db/model/admin')(sequelize);  // ตรวจสอบว่าเส้นทางนี้ถูกต้อง
@@ -41,7 +41,23 @@ requestRouter.post('/repair', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+requestRouter.put("/updateRequestData/:id", async (req, res) => {
+  try {
 
+      const rrid = parseInt(req.params.id);
+      const updatedRepairRequest = await RequestForRepair.update(req.body, {
+          where: { rrid: rrid }
+      });
+      if (updatedRepairRequest[0] > 0) {
+          res.send('Request updated successfully');
+      } else {
+          res.status(404).send('RequestRepairData is not found');
+      }
+  } catch (error) {
+      console.error('Error updating RequestData:', error);
+      res.status(500).send('Server Error');
+  }
+});
 requestRouter.get('/test', async (req, res) => {
     res.send('test')
 });

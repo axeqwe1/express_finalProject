@@ -1,5 +1,5 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
+const sequelize = require('../../db/config/sequelizeConfig');
 const equipmentType = require('../../db/model/equipment_type')(sequelize);
 const equipmentTypeRouter = express.Router();
 

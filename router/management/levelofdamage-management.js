@@ -1,80 +1,80 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
-const levelOfDamage = require('../../db/model/building')(sequelize); // Correctly referencing the building model
-const levelOfDamageRouter = express.Router();
+const sequelize = require('../../db/config/sequelizeConfig');
+const loed = require('../../db/model/levelOfDamage')(sequelize); // Correctly referencing the building model
+const loedRouter = express.Router();
 
-// GET all buildings
-levelOfDamageRouter.get("/getloeds", async (req, res) => {
+// GET all loeds
+loedRouter.get("/getloeds", async (req, res) => {
     try {
-        const buildings = await levelOfDamage.findAll();
-        res.json(buildings);
+        const loeds = await loed.findAll();
+        res.json(loeds);
     } catch (error) {
-        console.error('Error fetching buildings:', error);
+        console.error('Error fetching loeds:', error);
         res.status(500).send('Server Error');
     }
 });
 
-// GET building by ID
-levelOfDamageRouter.get("/getloed/:id", async (req, res) => {
+// GET loed by ID
+loedRouter.get("/getloed/:id", async (req, res) => {
     try {
-        const buildingId = parseInt(req.params.id);
-        const buildingData = await levelOfDamage.findByPk(buildingId);
-        if (buildingData) {
-            res.json(buildingData);
+        const loedId = parseInt(req.params.id);
+        const loedData = await loed.findByPk(loedId);
+        if (loedData) {
+            res.json(loedData);
         } else {
-            res.status(404).send('Building not found');
+            res.status(404).send('Loed not found');
         }
     } catch (error) {
-        console.error('Error fetching building:', error);
+        console.error('Error fetching loed:', error);
         res.status(500).send('Server Error');
     }
 });
 
-// POST new building
-levelOfDamageRouter.post("/addloed", async (req, res) => {
+// POST new loed
+loedRouter.post("/addloed", async (req, res) => {
     try {
-        const newBuilding = await levelOfDamage.create(req.body);
-        res.status(201).json(newBuilding);
+        const newLoed = await loed.create(req.body);
+        res.status(201).json(newLoed);
     } catch (error) {
-        console.error('Error adding building:', error);
+        console.error('Error adding loed:', error);
         res.status(500).send('Server Error');
     }
 });
 
-// PUT update building
-levelOfDamageRouter.put("/updateloed/:id", async (req, res) => {
+// PUT update loed
+loedRouter.put("/updateloed/:id", async (req, res) => {
     try {
-        const buildingId = parseInt(req.params.id);
-        const updatedBuilding = await levelOfDamage.update(req.body, {
-            where: { building_id: buildingId }
+        const loedId = parseInt(req.params.id);
+        const updatedLoed = await loed.update(req.body, {
+            where: { loed_id: loedId }
         });
-        if (updatedBuilding[0] > 0) {
-            res.send('Building updated successfully');
+        if (updatedLoed[0] > 0) {
+            res.send('Loed updated successfully');
         } else {
-            res.status(404).send('Building not found');
+            res.status(404).send('Loed not found');
         }
     } catch (error) {
-        console.error('Error updating building:', error);
+        console.error('Error updating loed:', error);
         res.status(500).send('Server Error');
     }
 });
 
-// DELETE a building
-levelOfDamageRouter.delete("/deleteloed/:id", async (req, res) => {
+// DELETE a loed
+loedRouter.delete("/deleteloed/:id", async (req, res) => {
     try {
-        const buildingId = parseInt(req.params.id);
-        const deletedBuilding = await levelOfDamage.destroy({
-            where: { building_id: buildingId }
+        const loedId = parseInt(req.params.id);
+        const deletedLoed = await loed.destroy({
+            where: { loed_id: loedId }
         });
-        if (deletedBuilding) {
-            res.send('Building deleted successfully');
+        if (deletedLoed) {
+            res.send('Loed deleted successfully');
         } else {
-            res.status(404).send('Building not found');
+            res.status(404).send('Loed not found');
         }
     } catch (error) {
-        console.error('Error deleting building:', error);
+        console.error('Error deleting loed:', error);
         res.status(500).send('Server Error');
     }
 });
 
-module.exports = levelOfDamageRouter;
+module.exports = loedRouter;

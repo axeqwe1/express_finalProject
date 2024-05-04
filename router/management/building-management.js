@@ -1,5 +1,5 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
+const sequelize = require('../../db/config/sequelizeConfig');
 const building = require('../../db/model/building')(sequelize); // Correctly referencing the building model
 const buildingRouter = express.Router();
 

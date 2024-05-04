@@ -1,8 +1,8 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
+const sequelize = require('../../db/config/sequelizeConfig');
 const chief = require('../../db/model/chief')(sequelize);
 const chiefRouter = express.Router();
-
+const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
 // GET all chiefs
 chiefRouter.get("/getchiefs", async (req, res) => {
     try {
@@ -32,7 +32,14 @@ chiefRouter.get("/getchief/:id", async (req, res) => {
 
 // POST new chief
 chiefRouter.post("/addchief", async (req, res) => {
+    const {firstname,lastname,phone,email} = req.body
     try {
+        if (await checkDuplicatesEmailPhone(email,phone)){
+            return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
+        }
+        if(await checkDuplicatesName(firstname,lastname)){
+            return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
+        }
         const newChief = await chief.create(req.body);
         res.status(201).json(newChief);
     } catch (error) {
@@ -43,7 +50,18 @@ chiefRouter.post("/addchief", async (req, res) => {
 
 // PUT update chief
 chiefRouter.put("/updatechief/:id", async (req, res) => {
+    const {firstname,lastname,phone,email} = req.body
     try {
+        if(phone || email){
+            if (await checkDuplicatesEmailPhone(email,phone)){
+                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
+            }
+        }
+        if(firstname || lastname){
+            if(await checkDuplicatesName(firstname,lastname)){
+                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
+            }
+        }
         const chiefId = parseInt(req.params.id);
         const updatedChief = await chief.update(req.body, {
             where: { chief_id: chiefId }

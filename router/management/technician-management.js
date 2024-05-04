@@ -1,8 +1,8 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
+const sequelize = require('../../db/config/sequelizeConfig');
 const technic = require('../../db/model/technician')(sequelize);
 const technicRouter = express.Router();
-
+const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
 // GET all technicians
 technicRouter.get("/gettechnicians", async (req, res) => {
     try {
@@ -13,7 +13,6 @@ technicRouter.get("/gettechnicians", async (req, res) => {
         res.status(500).send('Server Error');
     }
 }); 
-
 // GET technician by ID
 technicRouter.get("/gettechnician/:id", async (req, res) => {
     try {
@@ -29,10 +28,16 @@ technicRouter.get("/gettechnician/:id", async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
 // POST new technician
 technicRouter.post("/addtechnician", async (req, res) => {
+    const {firstname,lastname,phone,email} = req.body
     try {
+        if (await checkDuplicatesEmailPhone(email,phone)){
+            return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
+        }
+        if(await checkDuplicatesName(firstname,lastname)){
+            return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
+        }
         const newTechnician = await technic.create(req.body);
         res.status(201).json(newTechnician);
     } catch (error) {
@@ -40,10 +45,20 @@ technicRouter.post("/addtechnician", async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
 // PUT update technician
 technicRouter.put("/updatetechnician/:id", async (req, res) => {
+    const {firstname,lastname,phone,email} = req.body
     try {
+        if(phone || email){
+            if (await checkDuplicatesEmailPhone(email,phone)){
+                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
+            }
+        }
+        if(firstname || lastname){
+            if(await checkDuplicatesName(firstname,lastname)){
+                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
+            }
+        }
         const technicianId = parseInt(req.params.id);
         const updatedTechnician = await technic.update(req.body, {
             where: { technician_id: technicianId }

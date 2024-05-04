@@ -1,8 +1,8 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
-const employee = require('../../db/model/technician')(sequelize); // Assuming this represents an employee model
+const sequelize = require('../../db/config/sequelizeConfig');
+const employee = require('../../db/model/employee')(sequelize); // Assuming this represents an employee model
 const employeeRouter = express.Router();
-
+const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
 // GET all employees
 employeeRouter.get("/getemployees", async (req, res) => {
     try {
@@ -32,7 +32,14 @@ employeeRouter.get("/getemployee/:id", async (req, res) => {
 
 // POST a new employee
 employeeRouter.post("/addemployee", async (req, res) => {
+    const {firstname,lastname,phone,email} = req.body
     try {
+        if (await checkDuplicatesEmailPhone(email,phone)){
+            return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
+        }
+        if(await checkDuplicatesName(firstname,lastname)){
+            return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
+        }
         const newEmployee = await employee.create(req.body);
         res.status(201).json(newEmployee);
     } catch (error) {
@@ -43,10 +50,21 @@ employeeRouter.post("/addemployee", async (req, res) => {
 
 // PUT to update an employee
 employeeRouter.put("/updateemployee/:id", async (req, res) => {
+    const {firstname,lastname,phone,email} = req.body
     try {
+        if(phone || email){
+            if (await checkDuplicatesEmailPhone(email,phone)){
+                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
+            }
+        }
+        if(firstname || lastname){
+            if(await checkDuplicatesName(firstname,lastname)){
+                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
+            }
+        }
         const employeeId = parseInt(req.params.id);
         const updatedEmployee = await employee.update(req.body, {
-            where: { technician_id: employeeId }
+            where: { emp_id: employeeId }
         });
         if (updatedEmployee[0] > 0) {
             res.send('Employee updated successfully');
@@ -64,7 +82,7 @@ employeeRouter.delete("/deleteemployee/:id", async (req, res) => {
     try {
         const employeeId = parseInt(req.params.id);
         const deletedEmployee = await employee.destroy({
-            where: { technician_id: employeeId }
+            where: { emp_id: employeeId }
         });
         if (deletedEmployee) {
             res.send('Employee deleted successfully');

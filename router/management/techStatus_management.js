@@ -1,5 +1,5 @@
 const express = require('express');
-const sequelize = require('../../db/sequelizeConfig');
+const sequelize = require('../../db/config/sequelizeConfig');
 const techStatus = require('../../db/model/technician_status')(sequelize);
 const techStatusRouter = express.Router();
 

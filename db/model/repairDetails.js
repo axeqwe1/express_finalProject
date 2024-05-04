@@ -25,13 +25,6 @@ module.exports = (sequelize) => {
     tableName:'repair_details',
     createdAt:false,
     updatedAt:false,
-    unique: true,
-    indexes:[
-      {
-        unique: true,
-        fields: ['loed_id', 'rrce_id']
-      }
-    ]
   });
 
   return repairDetail;
