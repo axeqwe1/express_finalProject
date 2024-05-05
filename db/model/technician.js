@@ -10,8 +10,7 @@ module.exports = ( sequelize ) => {
           email: { type: DataTypes.STRING(50), allowNull: false, field: 'email' },
           password:{type: DataTypes.STRING(50),allowNull:false,field:'password'},
           departmentId: { type: DataTypes.INTEGER, allowNull: false, field: 'department_id' }, // FK for Department ID
-          techStatusId:{ type: DataTypes.INTEGER, allowNull: false, field: 'status_id'}
-
+          status_id:{ type: DataTypes.INTEGER, allowNull: false, field: 'status_id'}
       },
       {
           tableName: 'technicians',

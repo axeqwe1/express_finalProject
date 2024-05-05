@@ -18,7 +18,18 @@ const router = {
             assignWork:require('./action/assignwork_ac'),
             repairDetail:require('./action/repairDetail_ac')
         },
-
+    manageimage:
+        {
+            getlistImage:require('./manage-image/getListImage')
+        },
+    auth:
+        {
+            auth:require('./auth/auth')
+        },
+    display:
+        {
+            requestDisplay:require('./display/requestDisplay') 
+        }
 }
 
 module.exports = router

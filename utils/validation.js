@@ -51,7 +51,7 @@ async function checkDuplicatesName(firstname, lastname) {
       // วนloop ตามจำนวน table
       for (let table of tables) {
         let result = await table.findOne({
-          where: {rrid: rrid} 
+          where: {rrid: rrid}
       });
         if (result) return true; // Duplicate found
       }

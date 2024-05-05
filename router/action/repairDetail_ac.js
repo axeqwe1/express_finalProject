@@ -1,16 +1,11 @@
 const express = require('express');
-const sequelize = require('../../db/config/sequelizeConfig');
 // การนำเข้าโมเดลจากไฟล์โมเดลแต่ละไฟล์โดยตรง
-const assignWork = require('../../db/model/assignWork')(sequelize);
-const receiveRepair = require('../../db/model/receiveRepair')(sequelize)
-const Notification = require('../../db/model/notification')(sequelize);
-const RequestForRepair = require('../../db/model/requestForRepair')(sequelize)
-const repairDetail = require('../../db/model/repairDetails')(sequelize)
+const model = require('../../db/associatation')
 const repairDetailRouter = express.Router();
 
 repairDetailRouter.post('/addDetail', async (req, res) => {
   try {
-    const addDetail = await repairDetail.create(req.body)
+    const addDetail = await model.repairDetail.create(req.body)
     res.status(201).json(addDetail);
   } catch (error) {
     console.error('Error creating repairDetail:', error);
@@ -20,9 +15,24 @@ repairDetailRouter.post('/addDetail', async (req, res) => {
 // PUT update repairDetail
 repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
   try {
-
+      const {request_status} = req.body
       const detail_id = parseInt(req.params.id);
-      const updatedDetail = await repairDetail.update(req.body, {
+        // ค้นหา repair detail พร้อมรายละเอียดที่เกี่ยวข้อง receiveRepair และ requestForRepair
+        // ในคำสั่ง SQL คือ SELECT * FROM repairDetail 
+      if(request_status){
+        const detail = await model.repairDetail.findByPk(detail_id, {
+          include: [{
+            model: model.receiveRepair,
+            required: true,  // แก้ไขจาก require เป็น required และทำให้เป็น INNER JOIN
+            include:[{model:model.requestForRepair}]
+          }]
+        }).catch(err => {
+          console.error('Error fetching detail:', err);
+        });
+        const reqRepair = detail.receive_repair.request_for_repair; // ในส่วนนี้คือการเข้าtable Request for Repair ผ่าน repair detail ที่ได้ทำการ Join Table แล้ว
+        await reqRepair.update({request_status:request_status});
+      }
+      const updatedDetail = await model.repairDetail.update(req.body, {
           where: { rd_id: detail_id }
       });
       if (updatedDetail[0] > 0) {

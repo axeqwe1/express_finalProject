@@ -3,6 +3,7 @@ const sequelize = require('../../db/config/sequelizeConfig');
 const admin = require('../../db/model/admin')(sequelize);
 const adminRouter = express.Router();
 const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
+
 // GET all admins
 adminRouter.get("/getadmins", async (req, res) => {
     try {
