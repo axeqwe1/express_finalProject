@@ -7,8 +7,6 @@ const router = express.Router();
 router.get('/request-list',async (req,res)=>{
     try
     {
-        console.log(req.sessionID)
-        console.log("role ::::::",req.session.user.role)
         if(req.session.user.role == "Admin"){
             const result = await model.requestForRepair.findAll();
             return res.send(result)
@@ -20,29 +18,31 @@ router.get('/request-list',async (req,res)=>{
             return res.send(result)
         }
         else if (req.session.user.role == "Technician"){
-            // SELECT receive_repair.*
-            //        request_for_repair.*
-            //        assignWork.*
-            // FROM   receive_repair
-            // JOIN   requestForRepair ON receive_repair.rrid = request_for_repair.rrid
-            // JOIN   assignWork ON receive_repair.rrce_id = assignWork.rrce_id
-            // WHERE  receive_repair.tech_id = req.session.user.userId AND
-            //        request_for_repair.rrid = receive_repair.rrid AND
-            //        assignWork.rrce_id = receive_repair.rrce_id
-            const result = await model.receiveRepair.findAll({
-                where:{tech_id:req.session.user.userId},
-                include: [{
-                    model:model.requestForRepair,
-                    required:true, // เป็นการกำหนดว่าทำการ Join
-                    where:{
-                        rrid:Sequelize.col('receive_repair.rrid'),
+            // SELECT *
+            // FROM   `request_for_repair`
+            // JOIN   `receive_repair` ON `request_for_repair`.`rrid` = `receive_repair`.`rrid`
+            // JOIN   `assign_work` ON `request_for_repair`.`rrid` = `assign_work`.`rrid`
+            // WHERE  `receive_repair`.`tech_id` = 3 AND
+            //        `receive_repair`.`rrid` = `request_for_repair`.`rrid` AND
+            //        `assign_work`.`rrid` = `receive_repair`.`rrid`;
+            const result = await model.requestForRepair.findAll({
+                include:[
+                    {
+                        required:true,
+                        model:model.receiveRepair,
+                        where:{
+                            [Op.and]:[
+                                {tech_id:req.session.user.userId},
+                                {rrid:Sequelize.col('request_for_repair.rrid')}
+                            ]
+                        }
                     },
-                    include:[{
+                    {
                         required:true,
                         model:model.assignWork,
-                        where:{rrce_id:Sequelize.col('receive_repair.rrce_id')}
-                    }]
-                }]
+                        where:{rrid:Sequelize.col('request_for_repair.rrid')}
+                    }
+                ],
             })
             return res.send({message:'Login Success' , data:result})
         }
@@ -57,11 +57,69 @@ router.get('/request-list',async (req,res)=>{
     }
 })
 router.get('/request/:id',async (req,res) => {
-    try{
-
-    }catch(err)
+    const rrid = parseInt(req.params.id)
+    try
     {
-
+        console.log(req.params.id)
+        const checkReceive = await model.receiveRepair.findOne({where:{rrid:rrid}})
+        if(checkReceive){
+            // SELECT 
+            //     `request_for_repair`.*, 
+            //     `details`.`rd_id` AS `receive_repair.repair_details.rd_id`, 
+            //     `details`.`loed_id` AS `receive_repair.repair_details.loed_id`, 
+            //     `details`.`rrce_id` AS `receive_repair.repair_details.rrce_id`, 
+            //     `details`.`rd_description` AS `receive_repair.repair_details.rd_description` 
+            // FROM 
+            //     (
+            //         SELECT 
+            //             `request_for_repair`.`rrid`, 
+            //             `request_for_repair`.`rr_description`, 
+            //             `request_for_repair`.`rr_picture`, 
+            //             `request_for_repair`.`request_status`, 
+            //             `request_for_repair`.`timestamp`, 
+            //             `request_for_repair`.`employee_id`, 
+            //             `request_for_repair`.`building_id`, 
+            //             `request_for_repair`.`eq_id`, 
+            //             `receive_repair`.`rrce_id` AS `receive_repair.rrce_id`, 
+            //             `receive_repair`.`tech_id` AS `receive_repair.tech_id`, 
+            //             `receive_repair`.`date_receive` AS `receive_repair.date_receive`, 
+            //             `receive_repair`.`rrid` AS `receive_repair.rrid` 
+            //         FROM 
+            //             `request_for_repair` AS `request_for_repair` 
+            //             INNER JOIN `receive_repair` AS `receive_repair` 
+            //             ON `request_for_repair`.`rrid` = `receive_repair`.`rrid` 
+            //             AND `receive_repair`.`rrid` = 15 
+            //         LIMIT 1
+            //     ) AS `request_for_repair` 
+            // LEFT JOIN 
+            //     `repair_details` AS `details` 
+            // ON 
+            //     `receive_repair.rrce_id` = `details`.`rrce_id`;
+                const result = await model.requestForRepair.findOne({
+                    include:[{
+                        required:true,
+                        model:model.receiveRepair,
+                        where:{rrid:rrid},
+                        include:[{
+                            model:model.repairDetail,
+                        }]
+                    }]
+                });
+                return res.send(result)
+        }else{
+            const result = await model.requestForRepair.findOne({
+                where:{rrid:rrid}
+            })
+            if(result == null){
+                return res.send({message:"ไม่มีข้อมูลในระบบ"})
+            }
+            return res.send({data:result})
+        }
+    }
+    catch(err)
+    {
+        console.log(err)
+        res.send({message:err})
     }
 })
 

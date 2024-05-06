@@ -28,7 +28,9 @@ const router = {
         },
     display:
         {
-            requestDisplay:require('./display/requestDisplay') 
+            requestDisplay:require('./display/requestDisplay'),
+            technicianForAssign:require('./display/technicianForAssign'),
+            backlogRequest:require('./display/Backlog-request')
         }
 }
 

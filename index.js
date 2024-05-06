@@ -30,7 +30,6 @@ app.use('/managementdata', router.management.technicianStatus)
 app.use('/action', router.action.requestForRepair)
 app.use('/action', router.action.assignWork)
 app.use('/action', router.action.repairDetail)
-
 // manage image
 app.use('/manageImg',router.manageimage.getlistImage)
 app.use('/images',express.static('images'))
@@ -38,7 +37,8 @@ app.use('/images',express.static('images'))
 app.use('/auth',router.auth.auth)
 // display
 app.use('/display',router.display.requestDisplay)
-
+app.use('/display',router.display.technicianForAssign)
+app.use('/display',router.display.backlogRequest)
 // Example endpoint to check session data
 app.get('/check-session', (req, res) => {
   res.send({ sessionData: req.session, sessionID: req.sessionID });
