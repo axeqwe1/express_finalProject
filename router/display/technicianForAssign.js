@@ -40,6 +40,7 @@ router.get('/techReceive/:id', async (req,res) => {
             ],
             group:[`receive_repair.tech_id`]
         })
+        
         // ตรวจข้อมูลใน array ว่ามีข้อมูลหรือเปล่า --> จำนวนงานทั้งหมด
         if(!count[0]){
              totalCount = 0

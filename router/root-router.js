@@ -31,6 +31,11 @@ const router = {
             requestDisplay:require('./display/requestDisplay'),
             technicianForAssign:require('./display/technicianForAssign'),
             backlogRequest:require('./display/Backlog-request')
+        },
+    search:
+        {
+            searchRequest:require('./search/search-request'),
+            searchEquipment:require('./search/search-equipment')
         }
 }
 

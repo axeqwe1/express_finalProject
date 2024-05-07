@@ -39,6 +39,9 @@ app.use('/auth',router.auth.auth)
 app.use('/display',router.display.requestDisplay)
 app.use('/display',router.display.technicianForAssign)
 app.use('/display',router.display.backlogRequest)
+// search
+app.use('/search',router.search.searchRequest)
+app.use('/search',router.search.searchEquipment)
 // Example endpoint to check session data
 app.get('/check-session', (req, res) => {
   res.send({ sessionData: req.session, sessionID: req.sessionID });
