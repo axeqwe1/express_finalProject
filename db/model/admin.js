@@ -10,7 +10,7 @@ module.exports = ( sequelize ) => {
           phone: {type:DataTypes.STRING(10),allowNull:false,field:"phone"},
           email: { type: DataTypes.STRING(50), allowNull: false, field: 'email' },
           password:{type: DataTypes.STRING(50),allowNull:false,field:'password'},
-          departmentId: { type: DataTypes.INTEGER, allowNull: false, field: 'departmentId' } // FK for Department ID
+          departmentId: { type: DataTypes.INTEGER, allowNull: false, field: 'departmentId'} // FK for Department ID
 
       },
       {
