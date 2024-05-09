@@ -5,6 +5,7 @@ const sequelize = new Sequelize("repaircomputer_db", "root", "root",
     host: "localhost",
     dialect: "mysql",
     port:8006,
+    timezone: '+07:00'
   });
 
   module.exports = sequelize

@@ -21,21 +21,20 @@ router.post('/login', async (req, res) => {
                 if(user.tech_id) item.id = user.tech_id
                 if(user.chief_id) item.id = user.chief_id
                 user.id = item.id
-                console.log(user.id)
                 req.session.user = {
                     userId  :user.id,
                     user    :user.email,
                     role    :user.role,
                     IsLogin :true
                 }
-                console.log(user.role)
-                return res.send({ message: "Logged in successfully!", user, });
+                const userSession = req.session.user
+                return res.json({ message: "Logged in successfully!", userSession,user });
             }
         }
-        return res.status(404).send({ message: "User not found" });
+        return res.status(404).json({ message: "User not found" });
     } 
     catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({message:error});
     }
 });
 

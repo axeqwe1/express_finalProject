@@ -36,6 +36,10 @@ const router = {
         {
             searchRequest:require('./search/search-request'),
             searchEquipment:require('./search/search-equipment')
+        },
+    reports:
+        {
+            export_report:require('./report/export-report-api')
         }
 }
 
