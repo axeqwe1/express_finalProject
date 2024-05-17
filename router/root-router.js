@@ -30,7 +30,8 @@ const router = {
         {
             requestDisplay:require('./display/requestDisplay'),
             technicianForAssign:require('./display/technicianForAssign'),
-            backlogRequest:require('./display/Backlog-request')
+            backlogRequest:require('./display/Backlog-request'),
+            notificationDisplay:require('./display/displayNotification')
         },
     search:
         {
@@ -40,6 +41,10 @@ const router = {
     reports:
         {
             export_report:require('./report/export-report-api')
+        },
+    upload:
+        {
+            uploadImage:require('./upload')
         }
 }
 

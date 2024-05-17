@@ -33,18 +33,21 @@ app.use('/action', router.action.repairDetail)
 // manage image
 app.use('/manageImg',router.manageimage.getlistImage)
 app.use('/images',express.static('images'))
+app.use('/images',router.upload.uploadImage)
 // auth
 app.use('/auth',router.auth.auth)
 // display
 app.use('/display',router.display.requestDisplay)
 app.use('/display',router.display.technicianForAssign)
 app.use('/display',router.display.backlogRequest)
+app.use('/display',router.display.notificationDisplay)
 // search
 app.use('/search',router.search.searchRequest)
 app.use('/search',router.search.searchEquipment)
 // report
 app.use('/report',router.reports.export_report)
 // Example endpoint to check session data
+
 app.get('/download-csv', (req, res) => {
   const data = [
       { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' },

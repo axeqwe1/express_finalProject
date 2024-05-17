@@ -4,20 +4,22 @@ const { Op, Sequelize } = require('sequelize');
 
 const router = express.Router();
 
-router.get('/request-list',async (req,res)=>{
+router.get('/request-list/:role/:id',async (req,res)=>{
+    const role = req.params.role
+    const id = req.params.id
     try
     {
-        if(req.session.user.role == "Admin"){
+        if(role == "Admin"){
             const result = await model.requestForRepair.findAll();
-            return res.send(result)
+            return res.status(200).json({message:'Login Success' , data:result})
         }
-        else if (req.session.user.role == "Employee"){
+        else if (role == "Employee"){
             const result = await model.requestForRepair.findAll({
-                where: {employee_id:req.session.user.userId}
+                where: {employee_id:id}
             });
-            return res.send(result)
+            return res.status(200).json({message:'Login Success' , data:result})
         }
-        else if (req.session.user.role == "Technician"){
+        else if (role == "Technician"){
             // SELECT *
             // FROM   `request_for_repair`
             // JOIN   `receive_repair` ON `request_for_repair`.`rrid` = `receive_repair`.`rrid`
@@ -32,7 +34,7 @@ router.get('/request-list',async (req,res)=>{
                         model:model.receiveRepair,
                         where:{
                             [Op.and]:[
-                                {tech_id:req.session.user.userId},
+                                {tech_id:id},
                                 {rrid:Sequelize.col('request_for_repair.rrid')}
                             ]
                         }
@@ -43,17 +45,18 @@ router.get('/request-list',async (req,res)=>{
                         where:{rrid:Sequelize.col('request_for_repair.rrid')}
                     }
                 ],
+                
             })
-            return res.send({message:'Login Success' , data:result})
+            return res.status(200).json({message:'Login Success' , data:result})
         }
         else{
-            res.send({message:'ข้อมูลผู้ใช้งานไม่ถูกต้อง'})
+            res.status(400).json({message:'ข้อมูลผู้ใช้งานไม่ถูกต้อง'})
         } 
     }
     catch(err)
     {
         console.log(err)
-        res.send({message:err})
+        res.status(400).json({message:err})
     }
 })
 router.get('/request/:id',async (req,res) => {

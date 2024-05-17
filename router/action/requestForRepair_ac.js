@@ -7,14 +7,14 @@ const model = require('../../db/associatation')
 const requestRouter = express.Router();
 
 requestRouter.post('/repair', async (req, res) => {
-  const { description, picture, request_status, employeeId, buildingId, equipmentId } = req.body;
+  const { description, picture, employeeId, buildingId, equipmentId } = req.body;
 
   try {
     const result = await sequelize.transaction(async (t) => {
       const repair = await model.requestForRepair.create({
         rr_description: description,
         rr_picture: picture,
-        request_status: request_status,
+        request_status: "กำลังส่งการแจ้งซ่อม",
         employee_id: employeeId,
         building_id: buildingId,
         eq_id: equipmentId

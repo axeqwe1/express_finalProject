@@ -55,7 +55,7 @@ router.get("/export-csv", async (req, res) => {
          GROUP BY
             rr.eq_id) AS eq_repairs ON eq_repairs.eq_id = eq.eq_id
     WHERE
-        rfr.timestamp BETWEEN '${start_date} 00:00:00' AND '${end_date} 23:59:59';
+        rfr.timestamp BETWEEN '${"2024-05-03"} 00:00:00' AND '${"2024-05-13"} 23:59:59';
     `;
     const [results] = await sequelize.query(sql);
 
@@ -63,8 +63,8 @@ router.get("/export-csv", async (req, res) => {
       where: {
         timestamp: {
           [Op.between]: [
-            `${start_date} 00:00:00`,
-            `${end_date} 23:59:59`,
+            `${"2024-05-03"} 00:00:00`,
+            `${"2024-05-13"} 23:59:59`,
           ],
         },
       },
@@ -72,16 +72,18 @@ router.get("/export-csv", async (req, res) => {
         [Sequelize.fn("COUNT", Sequelize.col("rrid")), "request_count"],
       ],
     });
+    
     const data = results;
     data[0] = { ...data[0], ...totalRequest[0].dataValues };
     console.log(data[0]);
     const opts = { fields };
     const csv = parse(data, opts);
+    const csvWithBom = '\ufeff' + csv; // เพิ่ม BOM ข้างหน้า csv
 
     // กำหนดชื่อไฟล์ในการดาวน์โหลด
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.attachment("CustomFileName.csv");
-    res.send(csv);
+    res.send(csvWithBom);
 
     // console.log(results[0])
   } catch (err) {
