@@ -85,9 +85,9 @@ employeeRouter.delete("/deleteemployee/:id", async (req, res) => {
             where: { emp_id: employeeId }
         });
         if (deletedEmployee) {
-            res.send('Employee deleted successfully');
+            res.status(202).send({message:'Employee deleted successfully'});
         } else {
-            res.status(404).send('Employee not found');
+            res.status(404).send({error:'Employee not found'});
         }
     } catch (error) {
         console.error('Error deleting employee:', error);

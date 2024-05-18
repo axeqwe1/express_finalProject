@@ -82,9 +82,9 @@ technicRouter.delete("/deletetechnician/:id", async (req, res) => {
             where: { technician_id: technicianId }
         });
         if (deletedTechnician) {
-            res.send('Technician deleted successfully');
+            res.status(202).send({message:'Technician deleted successfully'});
         } else {
-            res.status(404).send('Technician not found');
+            res.status(404).send({error:'Technician not found'});
         }
     } catch (error) {
         console.error('Error deleting technician:', error);

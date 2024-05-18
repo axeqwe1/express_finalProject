@@ -85,9 +85,9 @@ chiefRouter.delete("/deletechief/:id", async (req, res) => {
             where: { chief_id: chiefId }
         });
         if (deletedChief) {
-            res.send('Chief deleted successfully');
+            res.status(202).send({message:'Chief deleted successfully'});
         } else {
-            res.status(404).send('Chief not found');
+            res.status(404).send({message:'Chief not found'});
         }
     } catch (error) {
         console.error('Error deleting chief:', error);

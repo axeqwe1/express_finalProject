@@ -83,13 +83,14 @@ adminRouter.put("/updateadmin/:id", async (req, res) => {
 adminRouter.delete("/deleteadmin/:id", async (req, res) => {
     try {
         const adminId = parseInt(req.params.id);
+        console.log(adminId)
         const deletedAdmin = await admin.destroy({
             where: { admin_id: adminId }
         });
         if (deletedAdmin) {
-            res.send('Admin deleted successfully');
+            res.status(202).send({message:'Admin deleted successfully'});
         } else {
-            res.status(404).send('Admin not found');
+            res.status(404).send({error:'Admin not found'});
         }
     } catch (error) {
         console.error('Error deleting admin:', error);
