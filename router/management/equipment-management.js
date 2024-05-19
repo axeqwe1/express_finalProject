@@ -46,7 +46,7 @@ equipmentRouter.put("/updateequipment/:id", async (req, res) => {
     try {
         const equipmentId = parseInt(req.params.id);
         const updatedEquipment = await equipment.update(req.body, {
-            where: { equipment_id: equipmentId }
+            where: { eq_id: equipmentId }
         });
         if (updatedEquipment[0] > 0) {
             res.send('Equipment updated successfully');
