@@ -78,33 +78,33 @@ router.get('/techReceive/:id', async (req,res) => {
         //     `receive_repair`.`tech_id` = 1 
         // GROUP BY 
         //     `receive_repair`.`tech_id`,`technician.firstname`,`technician.lastname`;
-        const technicianData = await model.receiveRepair.findAll({
-            where:{tech_id:techId},
-            include:[{
-                model:model.technician,
-                required:true,
-                attributes:['firstname','lastname','phone','email','departmentId'],
-                include:[{
-                    model:model.technicianStatus,
-                    required:true,
-                    attributes:['receive_request_status']
-                }]
-            }],
-            attributes: ['tech_id'],
-            group: ['technician.tech_id',`technician.firstname`,`technician.lastname`]
-        })
-        if(!technicianData[0]){
-            const techData = await model.technician.findOne({
-                where:{tech_id:techId},
-                include:[{
-                    required:true,
-                    model:model.technicianStatus,
-                    attributes:['receive_request_status']
-                }]
-            })
-            return res.send({Backlog:Backlog,SuccessWork:succCount,TotalWork:totalCount,Message:'ช่างคนนี้ไม่เคยรับงาน',data:techData,});
-        }
-        return res.send({Backlog:Backlog,SuccessWork:succCount,TotalWork:totalCount,data:technicianData});
+        // const technicianData = await model.receiveRepair.findAll({
+        //     where:{tech_id:techId},
+        //     include:[{
+        //         model:model.technician,
+        //         required:true,
+        //         attributes:['firstname','lastname','phone','email','departmentId'],
+        //         include:[{
+        //             model:model.technicianStatus,
+        //             required:true,
+        //             attributes:['receive_request_status']
+        //         }]
+        //     }],
+        //     attributes: ['tech_id'],
+        //     group: ['technician.tech_id',`technician.firstname`,`technician.lastname`]
+        // })
+        // if(!technicianData[0]){
+        //     const techData = await model.technician.findOne({
+        //         where:{tech_id:techId},
+        //         include:[{
+        //             required:true,
+        //             model:model.technicianStatus,
+        //             attributes:['receive_request_status']
+        //         }]
+        //     })
+        //     return res.send({Backlog:Backlog,SuccessWork:succCount,TotalWork:totalCount,Message:'ช่างคนนี้ไม่เคยรับงาน',data:techData,});
+        // }
+        return res.send({Backlog:Backlog,SuccessWork:succCount,TotalWork:totalCount});
         // return res.json({successCount});
     }
     catch(err){

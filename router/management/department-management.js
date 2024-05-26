@@ -46,7 +46,7 @@ departmentRouter.put("/updatedepartment/:id", async (req, res) => {
     try {
         const departmentId = parseInt(req.params.id);
         const updatedDepartment = await department.update(req.body, {
-            where: { id: departmentId } // Make sure to use the correct column name for the department's ID.
+            where: { department_id: departmentId } // Make sure to use the correct column name for the department's ID.
         });
         if (updatedDepartment[0] > 0) {
             res.send('Department updated successfully');
@@ -64,7 +64,7 @@ departmentRouter.delete("/deletedepartment/:id", async (req, res) => {
     try {
         const departmentId = parseInt(req.params.id);
         const deletedDepartment = await department.destroy({
-            where: { id: departmentId } // Make sure to use the correct column name for the department's ID.
+            where: { department_id: departmentId } // Make sure to use the correct column name for the department's ID.
         });
         if (deletedDepartment) {
             res.send('Department deleted successfully');

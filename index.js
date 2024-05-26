@@ -7,7 +7,7 @@ const port = 8000;
 const { parse } = require('json2csv');
 const { connectAndCreateDb } = require('./db/index.js')
 const router = require('./router/root-router.js')
-
+require('./utils/scheduleTask.js') // run task for check
 
 app.use(express.json());
 app.use(cors())
@@ -48,24 +48,24 @@ app.use('/search',router.search.searchEquipment)
 app.use('/report',router.reports.export_report)
 // Example endpoint to check session data
 
-app.get('/download-csv', (req, res) => {
-  const data = [
-      { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' },
-      { id: 2, firstName: 'Jane', lastName: 'Doe', email: 'jane.doe@example.com' }
-  ];
-  const fields = [
-      { label: 'ID', value: 'id' },
-      { label: 'First Name', value: 'firstName' },
-      { label: 'Last Name', value: 'lastName' },
-      { label: 'Email', value: 'email' }
-  ];
-  const opts = { fields };
-  const csv = parse(data, opts);
+// app.get('/download-csv', (req, res) => {
+//   const data = [
+//       { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' },
+//       { id: 2, firstName: 'Jane', lastName: 'Doe', email: 'jane.doe@example.com' }
+//   ];
+//   const fields = [
+//       { label: 'ID', value: 'id' },
+//       { label: 'First Name', value: 'firstName' },
+//       { label: 'Last Name', value: 'lastName' },
+//       { label: 'Email', value: 'email' }
+//   ];
+//   const opts = { fields };
+//   const csv = parse(data, opts);
 
-  res.header('Content-Type', 'text/csv');
-  res.attachment('filename.csv');
-  res.send(csv);
-});
+//   res.header('Content-Type', 'text/csv');
+//   res.attachment('filename.csv');
+//   res.send(csv);
+// });
 
 app.get('/check-session', (req, res) => {
   res.send({ sessionData: req.session, sessionID: req.sessionID });

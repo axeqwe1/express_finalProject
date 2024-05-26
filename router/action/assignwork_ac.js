@@ -46,7 +46,7 @@ assignRouter.post('/assign', async (req, res) => {
         where:{rrid:rrid},
         transaction: t
       })
-      return { assign,receive, notificationTechnician,notificationEmployee,updateStatusRequest };
+      return { message:"จ่ายงานสำเร็จ" };
     });
 
     res.status(201).json(result);

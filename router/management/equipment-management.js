@@ -64,7 +64,7 @@ equipmentRouter.delete("/deleteequipment/:id", async (req, res) => {
     try {
         const equipmentId = parseInt(req.params.id);
         const deletedEquipment = await equipment.destroy({
-            where: { equipment_id: equipmentId }
+            where: { eq_id: equipmentId }
         });
         if (deletedEquipment) {
             res.send('Equipment deleted successfully');

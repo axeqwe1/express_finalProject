@@ -9,10 +9,21 @@ router.get("/backlog-request-list", async (req, res) => {
     const timerequest = await model.requestForRepair.findAll({
       include: [
         {
-          model: model.receiveRepair,
-          required: false,
-          attributes: [],
+            model: model.receiveRepair,
+            attributes: [],
         },
+        {
+            required:true,
+            model:model.employee,
+        },
+        {
+            required:true,
+            model:model.building
+        },
+        {
+            required:true,
+            model:model.equipment
+        }
       ],
       where: Sequelize.literal(
         `NOT EXISTS (
@@ -31,6 +42,8 @@ router.get("/backlog-request-list", async (req, res) => {
       const differenceInDays = differenceInTime / MILLISECONDS_PER_DAY;
       return Math.ceil(differenceInDays) > 3;
     });
+
+    
     return res.send({ data: overdueRequest});
   } catch (err) {
     return res.send(err);

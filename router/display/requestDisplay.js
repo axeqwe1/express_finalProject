@@ -10,7 +10,28 @@ router.get('/request-list/:role/:id',async (req,res)=>{
     try
     {
         if(role == "Admin"){
-            const result = await model.requestForRepair.findAll();
+            const result = await model.requestForRepair.findAll({
+                include:[
+                    {
+                        model:model.receiveRepair
+                    },
+                    {
+                        model:model.assignWork
+                    },
+                    {
+                        required:true,
+                        model:model.employee,
+                    },
+                    {
+                        required:true,
+                        model:model.building
+                    },
+                    {
+                        required:true,
+                        model:model.equipment
+                    }
+                ]
+            });
             return res.status(200).json({message:'Login Success' , data:result})
         }
         else if (role == "Employee"){
@@ -37,15 +58,29 @@ router.get('/request-list/:role/:id',async (req,res)=>{
                                 {tech_id:id},
                                 {rrid:Sequelize.col('request_for_repair.rrid')}
                             ]
-                        }
+                        },
+                        include:[
+                            {
+                                model:model.repairDetail
+                            }
+                        ]
+                    },
+                    {
+                        model:model.assignWork
                     },
                     {
                         required:true,
-                        model:model.assignWork,
-                        where:{rrid:Sequelize.col('request_for_repair.rrid')}
+                        model:model.employee,
+                    },
+                    {
+                        required:true,
+                        model:model.building
+                    },
+                    {
+                        required:true,
+                        model:model.equipment
                     }
                 ],
-                
             })
             return res.status(200).json({message:'Login Success' , data:result})
         }
@@ -99,24 +134,67 @@ router.get('/request/:id',async (req,res) => {
             // ON 
             //     `receive_repair.rrce_id` = `details`.`rrce_id`;
                 const result = await model.requestForRepair.findOne({
-                    include:[{
-                        required:true,
-                        model:model.receiveRepair,
-                        where:{rrid:rrid},
-                        include:[{
-                            model:model.repairDetail,
-                        }]
-                    }]
+                    include:[
+                        {
+                            required:true,
+                            model:model.receiveRepair,
+                            where:{rrid:rrid},
+                            include:[
+                                {
+                                    model:model.repairDetail,
+                                    include:[
+                                        {
+                                            model:model.levelOfDamage
+                                        }
+                                    ]
+                                },
+                                {
+                                    model:model.technician
+                                },
+                            ]
+                        },
+                        {
+                            model:model.equipment, 
+                            include:[
+                                {
+                                    model:model.equipmentType,
+                                    where:{eqc_id:Sequelize.col('eqc_id')}
+                                }
+                            ]
+                        },
+                        {
+                            model:model.employee,
+                        },
+                        {
+                            model:model.building
+                        }
+                ]
                 });
                 return res.send(result)
         }else{
             const result = await model.requestForRepair.findOne({
-                where:{rrid:rrid}
+                where:{rrid:rrid},
+                include:[
+                    {
+                        model:model.equipment, 
+                        include:[
+                            {
+                                model:model.equipmentType,
+                            }
+                        ]
+                    },
+                    {
+                        model:model.employee,
+                    },
+                    {
+                        model:model.building
+                    }
+                ]
             })
             if(result == null){
                 return res.send({message:"ไม่มีข้อมูลในระบบ"})
             }
-            return res.send({data:result})
+            return res.send(result)
         }
     }
     catch(err)
