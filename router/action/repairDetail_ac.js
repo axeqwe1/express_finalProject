@@ -2,6 +2,8 @@ const express = require('express');
 // การนำเข้าโมเดลจากไฟล์โมเดลแต่ละไฟล์โดยตรง
 const model = require('../../db/associatation')
 const repairDetailRouter = express.Router();
+const WebSocket = require('ws');
+const wss = require('../../utils/WebSocketServer');
 
 repairDetailRouter.post('/addDetail', async (req, res) => {
   try {
@@ -41,6 +43,17 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
           noti_message: `มีการอัพเดทสถานะงาน: ${reqRepair.request_status}`,
           emp_id: reqRepair.employee_id
         }, { transaction: t });
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              title:`${reqRepair.rrid} อัพเดทสถานะ`,
+              message: `มีการอัพเดทสถานะงาน: ${reqRepair.request_status}`,
+              user_id: reqRepair.employee_id,
+              role:"Employee",
+              timestamp: new Date()
+            }));
+          }
+        });
       }
 
       const updatedDetail = await model.repairDetail.update(req.body, {

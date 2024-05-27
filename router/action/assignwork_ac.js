@@ -4,6 +4,8 @@ const sequelize = require('../../db/config/sequelizeConfig');
 const model = require('../../db/associatation')
 const assignRouter = express.Router();
 const { checkDuplicatesAssignWork } = require('../../utils/validation');
+const WebSocket = require('ws');
+const wss = require('../../utils/WebSocketServer');
 // POST /repairs - Create a new repair request and a notification
 assignRouter.post('/assign', async (req, res) => {
   const { admin_id,tech_id,rrid } = req.body;
@@ -24,16 +26,40 @@ assignRouter.post('/assign', async (req, res) => {
       },{tracnsaction:t})
 
       const notificationTechnician = await model.notification.create({
-        noti_message: `you got assign work:${rrid} assign by:${admin_id}`,
+        noti_message: `ได้รับมอบหมายงาน ${rrid}`,
         tech_id: tech_id  // ตรงนี้ก็ต้องให้แน่ใจว่าส่งค่าที่ถูกต้อง
       }, { transaction: t });
+
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            title:`ได้รับมอบหมายงาน`,
+            message: `รหัสงาน:${rrid}`,
+            user_id: tech_id,
+            role:"Technician",
+            timestamp: new Date()
+          }));
+        }
+      });
       
       const employeeFromRequest = await model.requestForRepair.findAll(
         {
           where:{rrid:rrid},
           transaction: t
         });
+
       const notificationEmployee = await Promise.all(employeeFromRequest.map(items => {
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              title:`รับงาน`,
+              message: `คำขอ ${rrid} ได้มีคนรับงานแล้ว`,
+              user_id: items.employee_id,
+              role:"Employee",
+              timestamp: new Date()
+            }));
+          }
+        });
         return model.notification.create({
           noti_message: `คำขอ ${rrid} ได้มีคนรับงานแล้ว`,
           emp_id: items.employee_id  // ตรงนี้ก็ต้องให้แน่ใจว่าส่งค่าที่ถูกต้อง

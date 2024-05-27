@@ -5,6 +5,8 @@ const Notification = require('../../db/model/notification')(sequelize);
 const Admin = require('../../db/model/admin')(sequelize);  // ตรวจสอบว่าเส้นทางนี้ถูกต้อง
 const model = require('../../db/associatation')
 const requestRouter = express.Router();
+const WebSocket = require('ws');
+const wss = require('../../utils/WebSocketServer'); // ตรวจสอบว่าเส้นทางนี้ถูกต้อง
 
 requestRouter.post('/repair', async (req, res) => {
   const { description, picture, employeeId, buildingId, equipmentId } = req.body;
@@ -24,11 +26,24 @@ requestRouter.post('/repair', async (req, res) => {
       const admins = await Admin.findAll({ transaction: t });
 
       // สร้างการแจ้งเตือนสำหรับแต่ละ Admin
-      const notifications = await Promise.all(admins.map(items => {
+      const notifications = await Promise.all(admins.map(async (items) => {
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              title:`มีคำขอเข้าสู่ระบบ`,
+              message: `มีคำขอการแจ้งซ่อมเข้าสู่ระบบ:${description}.`,
+              user_id: items.admin_id,
+              role:"Admin",
+              timestamp: new Date()
+            }));
+          }
+        });
+
         return model.notification.create({
           noti_message: `New repair request created: ${description}`,
           admin_id: items.admin_id  // ตรวจสอบว่าชื่อฟิลด์ในโมเดล Notification คือ admin_id
         }, { transaction: t })
+  
       }));
 
       return { repair, notifications };
