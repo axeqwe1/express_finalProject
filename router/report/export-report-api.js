@@ -4,6 +4,7 @@ const { parse } = require("json2csv");
 const router = express.Router();
 const model = require("../../db/associatation");
 const sequelize = require("../../db/config/sequelizeConfig");
+
 router.get("/export-csv", async (req, res) => {
   const fields = [
     { label: "rrid", value: "rrid"},
@@ -89,6 +90,65 @@ router.get("/export-csv", async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.send({ error: err });
+  }
+});
+router.get("/report-data", async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+    const sql = `
+      SELECT
+        rfr.rrid,
+        rfr.eq_id,
+        rfr.request_status,
+        eq.eq_name,
+        eqType.eqc_name,
+        tech.firstname,
+        tech.lastname,
+        coalesce(eq_repairs.repair_count, 0) AS repair_count,
+        rfr.timestamp
+      FROM
+        request_for_repair AS rfr
+      LEFT JOIN
+        receive_repair AS rrce ON rrce.rrid = rfr.rrid
+      LEFT JOIN
+        technicians AS tech ON rrce.tech_id = tech.tech_id
+      LEFT JOIN
+        equipments AS eq ON rfr.eq_id = eq.eq_id
+      LEFT JOIN
+        equipment_Types AS eqType ON eq.eqc_id = eqType.eqc_id
+      LEFT JOIN
+        (SELECT
+            COUNT(rr.eq_id) AS repair_count,
+            rr.eq_id
+         FROM
+            request_for_repair AS rr
+         GROUP BY
+            rr.eq_id) AS eq_repairs ON eq_repairs.eq_id = eq.eq_id
+      WHERE
+        rfr.timestamp BETWEEN '${start_date} 00:00:00' AND '${end_date} 23:59:59';
+    `;
+    const [results] = await sequelize.query(sql);
+
+    const totalRequest = await model.requestForRepair.findAll({
+      where: {
+        timestamp: {
+          [Op.between]: [`${start_date} 00:00:00`, `${end_date} 23:59:59`],
+        },
+      },
+      attributes: [
+        [Sequelize.fn("COUNT", Sequelize.col("rrid")), "request_count"],
+      ],
+    });
+
+    const data = results.map(result => ({
+      ...result,
+      totalRequests: totalRequest[0].dataValues.request_count
+    }));
+
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: err.message });
   }
 });
 

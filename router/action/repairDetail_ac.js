@@ -6,9 +6,53 @@ const WebSocket = require('ws');
 const wss = require('../../utils/WebSocketServer');
 
 repairDetailRouter.post('/addDetail', async (req, res) => {
+  const { request_status } = req.body;
   try {
-    const addDetail = await model.repairDetail.create(req.body)
-    res.status(201).json(addDetail);
+    // Start a transaction
+    await model.sequelize.transaction(async (t) => {
+      // Create the repair detail
+      const addDetail = await model.repairDetail.create(req.body, { transaction: t });
+
+      // Fetch the related receiveRepair and requestForRepair records
+      const detail = await model.repairDetail.findByPk(addDetail.rd_id, {
+        include: [{
+          model: model.receiveRepair,
+          required: true,
+          include: [{ model: model.requestForRepair }]
+        }],
+        transaction: t  // Pass transaction to findByPk
+      });
+
+      if (detail) {
+        const reqRepair = detail.receive_repair.request_for_repair;
+
+        // Update the request status
+        const updatedRequest = await reqRepair.update({ request_status: request_status }, { transaction: t });
+
+        // Create a notification
+        await model.notification.create({
+          noti_message: `มีการอัพเดทสถานะงาน: ${updatedRequest.request_status}`,
+          emp_id: updatedRequest.employee_id
+        }, { transaction: t });
+
+        // Send WebSocket notification
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              title: `${updatedRequest.rrid} อัพเดทสถานะ`,
+              message: `มีการอัพเดทสถานะงาน: ${updatedRequest.request_status}`,
+              user_id: updatedRequest.employee_id,
+              role: "Employee",
+              timestamp: new Date()
+            }));
+          }
+        });
+
+        res.status(201).json({ message: "เพิ่มรายละเอียดการซ่อมสำเร็จ" });
+      } else {
+        throw new Error('Related receiveRepair or requestForRepair not found');
+      }
+    });
   } catch (error) {
     console.error('Error creating repairDetail:', error);
     res.status(500).send('Server Error');
@@ -61,7 +105,7 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
       }, { transaction: t });
 
       if (updatedDetail[0] > 0 || checkStatusRequest) {
-        res.send('Detail updated successfully');
+        res.json({message:'Detail updated successfully'});
       } else {
         res.status(404).send('Detail Data is not found');
       }

@@ -17,8 +17,8 @@ techStatusRouter.get("/gettechstatus", async (req, res) => {
 // GET technician by ID
 techStatusRouter.get("/gettechstatus/:id", async (req, res) => {
     try {
-        const technicianId = parseInt(req.params.id);
-        const technicianData = await techStatus.findByPk(technicianId);
+        const status_id = parseInt(req.params.id);
+        const technicianData = await techStatus.findByPk(status_id);
         if (technicianData) {
             res.json(technicianData);
         } else {
@@ -44,9 +44,9 @@ techStatusRouter.post("/addtechstatus", async (req, res) => {
 // PUT update technician
 techStatusRouter.put("/updatetechstatus/:id", async (req, res) => {
     try {
-        const technicianId = parseInt(req.params.id);
+        const status_id = parseInt(req.params.id);
         const updatedTechnician = await techStatus.update(req.body, {
-            where: { technician_id: technicianId }
+            where: { status_id: status_id }
         });
         if (updatedTechnician[0] > 0) {
             res.send('Technician updated successfully');
@@ -62,9 +62,9 @@ techStatusRouter.put("/updatetechstatus/:id", async (req, res) => {
 // DELETE a technician
 techStatusRouter.delete("/deletetechstatus/:id", async (req, res) => {
     try {
-        const technicianId = parseInt(req.params.id);
+        const status_id = parseInt(req.params.id);
         const deletedTechnician = await techStatus.destroy({
-            where: { technician_id: technicianId }
+            where: { status_id: status_id }
         });
         if (deletedTechnician) {
             res.send('Technician deleted successfully');

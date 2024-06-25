@@ -67,7 +67,7 @@ assignRouter.post('/assign', async (req, res) => {
       }))
       // const notificationEmployee = await 
       const updateStatusRequest = await model.requestForRepair.update({
-          request_status:"pending"
+          request_status:"กำลังดำเนินการ"
       },{
         where:{rrid:rrid},
         transaction: t

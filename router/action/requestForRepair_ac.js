@@ -2,11 +2,11 @@ const express = require('express');
 const sequelize = require('../../db/config/sequelizeConfig');
 const RequestForRepair = require('../../db/model/requestForRepair')(sequelize);
 const Notification = require('../../db/model/notification')(sequelize);
-const Admin = require('../../db/model/admin')(sequelize);  // ตรวจสอบว่าเส้นทางนี้ถูกต้อง
+const Admin = require('../../db/model/admin')(sequelize); 
 const model = require('../../db/associatation')
 const requestRouter = express.Router();
 const WebSocket = require('ws');
-const wss = require('../../utils/WebSocketServer'); // ตรวจสอบว่าเส้นทางนี้ถูกต้อง
+const wss = require('../../utils/WebSocketServer');
 
 requestRouter.post('/repair', async (req, res) => {
   const { description, picture, employeeId, buildingId, equipmentId } = req.body;

@@ -21,6 +21,7 @@ module.exports = (sequelize) => {
         }
     },
     rd_description: { type: DataTypes.TEXT, allowNull: true },
+    timestamp: {type:DataTypes.DATE,allowNull:false,defaultValue: literal('CURRENT_TIMESTAMP')}
   },{
     tableName:'repair_details',
     createdAt:false,
