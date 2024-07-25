@@ -36,6 +36,26 @@ router.get('/request-list/:role/:id',async (req,res)=>{
         }
         else if (role == "Employee"){
             const result = await model.requestForRepair.findAll({
+                include:[
+                    {
+                        model:model.receiveRepair
+                    },
+                    {
+                        model:model.assignWork
+                    },
+                    {
+                        required:true,
+                        model:model.employee,
+                    },
+                    {
+                        required:true,
+                        model:model.building
+                    },
+                    {
+                        required:true,
+                        model:model.equipment
+                    }
+                ],
                 where: {employee_id:id}
             });
             return res.status(200).json({message:'Login Success' , data:result})

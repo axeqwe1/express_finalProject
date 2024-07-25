@@ -94,7 +94,9 @@ router.get("/export-csv", async (req, res) => {
 });
 router.get("/report-data", async (req, res) => {
   try {
-    const { start_date, end_date } = req.query;
+    // const { start_date, end_date } = req.query;
+    const start_date = "2024-05-03"
+    const end_date = "2024-07-15"
     const sql = `
       SELECT
         rfr.rrid,
@@ -149,6 +151,32 @@ router.get("/report-data", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send({ error: err.message });
+  }
+});
+router.get('/dashboard-data', async (req, res) => {
+  try {
+      // จำนวนทั้งหมดของ request_for_repair
+      const totalCount = await model.requestForRepair.count();
+
+      // จำนวนงานที่รับไปแล้วทั้งหมด
+      const receivedCount = await model.receiveRepair.count({
+          include: [{
+              model: model.requestForRepair,
+              required: true,
+              attributes: [],
+          }]
+      });
+
+      // จำนวนงานที่ยังไม่ได้มีการรับงาน
+      const backlog = totalCount - receivedCount;
+
+      return res.send({
+          TotalWork: totalCount,
+          ReceiveWork: receivedCount,
+          Backlog: backlog,
+      });
+  } catch (err) {
+      return res.status(500).json({ error: err.message });
   }
 });
 

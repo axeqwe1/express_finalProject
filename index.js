@@ -67,8 +67,8 @@ app.use('/report',router.reports.export_report)
 //   res.send(csv);
 // });
 
-app.get('/check-session', (req, res) => {
-  res.send({ sessionData: req.session, sessionID: req.sessionID });
+app.get('/check_connection', (req, res) => {
+  res.status(200).json({ success: true });
 });
 app.listen(port, async () => {
   await connectAndCreateDb()
