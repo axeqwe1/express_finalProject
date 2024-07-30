@@ -1,11 +1,12 @@
 const express = require("express");
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, where } = require("sequelize");
 const { parse } = require("json2csv");
 const router = express.Router();
 const model = require("../../db/associatation");
 const sequelize = require("../../db/config/sequelizeConfig");
+const moment = require('moment');
 
-router.get("/export-csv", async (req, res) => {
+router.post("/export-csv", async (req, res) => {
   const fields = [
     { label: "rrid", value: "rrid"},
     { label: "statusRequest", value: "request_status"},
@@ -25,6 +26,9 @@ router.get("/export-csv", async (req, res) => {
   ];
 
   const { start_date, end_date } = req.body;
+  const formattedStartDate = moment(start_date,"DD-MM-YYYY").format("YYYY-MM-DD");
+  const formattedEndDate = moment(end_date,"DD-MM-YYYY").format("YYYY-MM-DD");
+
   try {
     const sql = `
         SELECT
@@ -56,7 +60,7 @@ router.get("/export-csv", async (req, res) => {
          GROUP BY
             rr.eq_id) AS eq_repairs ON eq_repairs.eq_id = eq.eq_id
     WHERE
-        rfr.timestamp BETWEEN '${"2024-05-03"} 00:00:00' AND '${"2024-05-13"} 23:59:59';
+        rfr.timestamp BETWEEN '${formattedStartDate} 00:00:00' AND '${formattedEndDate} 23:59:59';
     `;
     const [results] = await sequelize.query(sql);
 
@@ -64,8 +68,8 @@ router.get("/export-csv", async (req, res) => {
       where: {
         timestamp: {
           [Op.between]: [
-            `${"2024-05-03"} 00:00:00`,
-            `${"2024-05-13"} 23:59:59`,
+            `${formattedStartDate} 00:00:00`,
+            `${formattedEndDate} 23:59:59`,
           ],
         },
       },
@@ -92,11 +96,16 @@ router.get("/export-csv", async (req, res) => {
     return res.send({ error: err });
   }
 });
-router.get("/report-data", async (req, res) => {
+
+
+router.post("/report-data", async (req, res) => {
   try {
-    // const { start_date, end_date } = req.query;
-    const start_date = "2024-05-03"
-    const end_date = "2024-07-15"
+    const { start_date, end_date } = req.body;
+    const formattedStartDate = moment(start_date,"DD-MM-YYYY").format("YYYY-MM-DD");
+    const formattedEndDate = moment(end_date,"DD-MM-YYYY").format("YYYY-MM-DD");
+    console.log(`${formattedStartDate} and ${formattedEndDate}`)
+    // const start_date = "2024/05/03"
+    // const end_date = "2024/07/15"
     const sql = `
       SELECT
         rfr.rrid,
@@ -127,14 +136,14 @@ router.get("/report-data", async (req, res) => {
          GROUP BY
             rr.eq_id) AS eq_repairs ON eq_repairs.eq_id = eq.eq_id
       WHERE
-        rfr.timestamp BETWEEN '${start_date} 00:00:00' AND '${end_date} 23:59:59';
+        rfr.timestamp BETWEEN '${formattedStartDate } 00:00:00' AND '${formattedEndDate} 23:59:59';
     `;
     const [results] = await sequelize.query(sql);
 
     const totalRequest = await model.requestForRepair.findAll({
       where: {
         timestamp: {
-          [Op.between]: [`${start_date} 00:00:00`, `${end_date} 23:59:59`],
+          [Op.between]: [`${formattedStartDate} 00:00:00`, `${formattedEndDate} 23:59:59`],
         },
       },
       attributes: [
@@ -153,6 +162,7 @@ router.get("/report-data", async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 });
+
 router.get('/dashboard-data', async (req, res) => {
   try {
       // จำนวนทั้งหมดของ request_for_repair
@@ -166,6 +176,11 @@ router.get('/dashboard-data', async (req, res) => {
               attributes: [],
           }]
       });
+      const successWorkCount = await model.requestForRepair.count({
+            where:{
+              request_status:'ส่งคืนเสร็จสิ้น'
+            }
+      })
 
       // จำนวนงานที่ยังไม่ได้มีการรับงาน
       const backlog = totalCount - receivedCount;
@@ -174,6 +189,7 @@ router.get('/dashboard-data', async (req, res) => {
           TotalWork: totalCount,
           ReceiveWork: receivedCount,
           Backlog: backlog,
+          SuccessWork:successWorkCount,
       });
   } catch (err) {
       return res.status(500).json({ error: err.message });
