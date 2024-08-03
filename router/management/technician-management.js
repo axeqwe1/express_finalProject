@@ -49,16 +49,6 @@ technicRouter.post("/addtechnician", async (req, res) => {
 technicRouter.put("/updatetechnician/:id", async (req, res) => {
     const {firstname,lastname,phone,email} = req.body
     try {
-        if(phone || email){
-            if (await checkDuplicatesEmailPhone(email,phone)){
-                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
-            }
-        }
-        if(firstname || lastname){
-            if(await checkDuplicatesName(firstname,lastname)){
-                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
-            }
-        }
         const technicianId = parseInt(req.params.id);
         const updatedTechnician = await technic.update(req.body, {
             where: { technician_id: technicianId }
@@ -66,7 +56,7 @@ technicRouter.put("/updatetechnician/:id", async (req, res) => {
         if (updatedTechnician[0] > 0) {
             res.send('Technician updated successfully');
         } else {
-            res.status(404).send('Technician not found');
+            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
         }
     } catch (error) {
         console.error('Error updating technician:', error);

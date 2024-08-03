@@ -53,17 +53,6 @@ adminRouter.post("/addadmin", async (req, res) => {
 adminRouter.put("/updateadmin/:id", async (req, res) => {
     const {firstname,lastname,phone,email} = req.body
     try {
-        //เป็นการตรวจสอบว่าในrequestมีข้อมูล email หรือ phone หรือเปล่า ถ้าส่งเป็น undifine จะไม่ทำการตรวจสอบข้อมูลซ้ำ
-        if(phone || email){
-            if (await checkDuplicatesEmailPhone(email,phone)){
-                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
-            }
-        }
-        if(firstname || lastname){
-            if(await checkDuplicatesName(firstname,lastname)){
-                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
-            }
-        }
         const adminId = parseInt(req.params.id);
         const updatedAdmin = await admin.update(req.body, {
             where: { admin_id: adminId }
@@ -71,7 +60,7 @@ adminRouter.put("/updateadmin/:id", async (req, res) => {
         if (updatedAdmin[0] > 0) {
             res.send('Admin updated successfully');
         } else {
-            res.status(404).send('Admin not found');
+            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
         }
     } catch (error) {
         console.error('Error updating admin:', error);

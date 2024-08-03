@@ -52,16 +52,6 @@ chiefRouter.post("/addchief", async (req, res) => {
 chiefRouter.put("/updatechief/:id", async (req, res) => {
     const {firstname,lastname,phone,email} = req.body
     try {
-        if(phone || email){
-            if (await checkDuplicatesEmailPhone(email,phone)){
-                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
-            }
-        }
-        if(firstname || lastname){
-            if(await checkDuplicatesName(firstname,lastname)){
-                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
-            }
-        }
         const chiefId = parseInt(req.params.id);
         const updatedChief = await chief.update(req.body, {
             where: { chief_id: chiefId }
@@ -69,7 +59,7 @@ chiefRouter.put("/updatechief/:id", async (req, res) => {
         if (updatedChief[0] > 0) {
             res.send('Chief updated successfully');
         } else {
-            res.status(404).send('Chief not found');
+            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
         }
     } catch (error) {
         console.error('Error updating chief:', error);

@@ -51,7 +51,7 @@ departmentRouter.put("/updatedepartment/:id", async (req, res) => {
         if (updatedDepartment[0] > 0) {
             res.send('Department updated successfully');
         } else {
-            res.status(404).send('Department not found');
+
         }
     } catch (error) {
         console.error('Error updating department:', error);

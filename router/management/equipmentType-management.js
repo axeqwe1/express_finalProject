@@ -51,7 +51,7 @@ equipmentTypeRouter.put("/updateequipmenttype/:id", async (req, res) => {
         if (updatedEquipmentType[0] > 0) {
             res.send('Equipment type updated successfully');
         } else {
-            res.status(404).send('Equipment type not found');
+
         }
     } catch (error) {
         console.error('Error updating equipment type:', error);

@@ -51,7 +51,7 @@ buildingRouter.put("/updatebuilding/:id", async (req, res) => {
         if (updatedBuilding[0] > 0) {
             res.send('Building updated successfully');
         } else {
-            res.status(404).send('Building not found');
+
         }
     } catch (error) {
         console.error('Error updating building:', error);

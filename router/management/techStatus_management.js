@@ -51,7 +51,7 @@ techStatusRouter.put("/updatetechstatus/:id", async (req, res) => {
         if (updatedTechnician[0] > 0) {
             res.send('Technician updated successfully');
         } else {
-            res.status(404).send('Technician not found');
+
         }
     } catch (error) {
         console.error('Error updating technician:', error);

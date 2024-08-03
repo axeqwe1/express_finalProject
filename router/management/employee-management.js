@@ -52,16 +52,6 @@ employeeRouter.post("/addemployee", async (req, res) => {
 employeeRouter.put("/updateemployee/:id", async (req, res) => {
     const {firstname,lastname,phone,email} = req.body
     try {
-        if(phone || email){
-            if (await checkDuplicatesEmailPhone(email,phone)){
-                return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
-            }
-        }
-        if(firstname || lastname){
-            if(await checkDuplicatesName(firstname,lastname)){
-                return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
-            }
-        }
         const employeeId = parseInt(req.params.id);
         const updatedEmployee = await employee.update(req.body, {
             where: { emp_id: employeeId }
@@ -69,7 +59,7 @@ employeeRouter.put("/updateemployee/:id", async (req, res) => {
         if (updatedEmployee[0] > 0) {
             res.send('Employee updated successfully');
         } else {
-            res.status(404).send('Employee not found');
+            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
         }
     } catch (error) {
         console.error('Error updating employee:', error);
