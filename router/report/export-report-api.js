@@ -8,21 +8,21 @@ const moment = require('moment');
 
 router.post("/export-csv", async (req, res) => {
   const fields = [
-    { label: "rrid", value: "rrid"},
-    { label: "statusRequest", value: "request_status"},
-    { label: "equipmentName", value: "eq_name"},
-    { label: "RepairCountEq", value: "repair_count"},
-    { label: "equipmentType", value: "eqc_name" },
+    { label: "รหัสแจ้งซ่อม", value: "rrid"},
+    { label: "สถานะงาน", value: "request_status"},
+    { label: "ชื่ออุปกรณ์", value: "eq_name"},
+    { label: "จำนวนการซ่อม", value: "repair_count"},
+    { label: "ประเภทอุปกรณ์", value: "eqc_name" },
     {
-      label: "technicianReceiveName",
+      label: "ช่างรับงาน",
       value: (record) => {
         const firstName = record.firstname ? record.firstname : ""; // ตรวจสอบค่า null ของ record.firstname
         const lastName = record.lastname ? record.lastname : ""; // ตรวจสอบค่า null ของ record.lastname
         return `${firstName} ${lastName}`; // รวมเป็น string
       },
     },
-    { label: "DateRequest", value: "timestamp" },
-    { label: "Total Requests", value: "request_count" },
+    { label: "วันที่แจ้งซ่อม", value: "timestamp" },
+    { label: "จำนวนแจ้งซ่อมทั้งหมดในระบบ", value: "request_count" },
   ];
 
   const { start_date, end_date } = req.body;
