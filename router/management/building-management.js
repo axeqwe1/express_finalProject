@@ -73,7 +73,11 @@ buildingRouter.delete("/deletebuilding/:id", async (req, res) => {
         }
     } catch (error) {
         console.error('Error deleting building:', error);
-        res.status(500).send('Server Error');
+        if (error.name === 'SequelizeForeignKeyConstraintError') {
+            res.status(409).send('ไม่สามารถลบข้อมูลนี้ได้ขณะนี้เนื่องจากมีการใช้ข้อมูลนี้ในระบบ.' );
+        } else {
+            res.status(500).send('Server Error');
+        }
     }
 });
 

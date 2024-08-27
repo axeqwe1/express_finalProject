@@ -27,7 +27,7 @@ router.get('/techReceive/:id', async (req,res) => {
         //     `receive_repair`.`tech_id`;
         const successCount = await model.requestForRepair.findAll({
             where:{
-                request_status:'success'
+                request_status:'ส่งคืนเสร็จสิ้น'
             },
             include:[{
                 model:model.receiveRepair,

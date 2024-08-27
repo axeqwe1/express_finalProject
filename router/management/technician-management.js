@@ -51,7 +51,7 @@ technicRouter.put("/updatetechnician/:id", async (req, res) => {
     try {
         const technicianId = parseInt(req.params.id);
         const updatedTechnician = await technic.update(req.body, {
-            where: { technician_id: technicianId }
+            where: { tech_id: technicianId }
         });
         if (updatedTechnician[0] > 0) {
             res.send('Technician updated successfully');
@@ -69,7 +69,7 @@ technicRouter.delete("/deletetechnician/:id", async (req, res) => {
     try {
         const technicianId = parseInt(req.params.id);
         const deletedTechnician = await technic.destroy({
-            where: { technician_id: technicianId }
+            where: { tech_id: technicianId }
         });
         if (deletedTechnician) {
             res.status(202).send({message:'Technician deleted successfully'});
@@ -77,8 +77,12 @@ technicRouter.delete("/deletetechnician/:id", async (req, res) => {
             res.status(404).send({error:'Technician not found'});
         }
     } catch (error) {
-        console.error('Error deleting technician:', error);
-        res.status(500).send('Server Error');
+        console.error('Error deleting tech:', error);
+        if (error.name === 'SequelizeForeignKeyConstraintError') {
+            res.status(409).send('ไม่สามารถลบข้อมูลนี้ได้ขณะนี้เนื่องจากมีการใช้ข้อมูลนี้ในระบบ.' );
+        } else {
+            res.status(500).send('Server Error');
+        }
     }
 });
 

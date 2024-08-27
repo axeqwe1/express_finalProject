@@ -70,7 +70,6 @@ const checkOverdueRequests = async () => {
         console.log("send notification success")
       }
     }
-
   } catch (error) {
     console.error('Error checking overdue requests:', error);
   }

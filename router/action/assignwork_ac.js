@@ -6,14 +6,21 @@ const assignRouter = express.Router();
 const { checkDuplicatesAssignWork } = require('../../utils/validation');
 const WebSocket = require('ws');
 const wss = require('../../utils/WebSocketServer');
-// POST /repairs - Create a new repair request and a notification
 assignRouter.post('/assign', async (req, res) => {
-  const { admin_id,tech_id,rrid } = req.body;
+  const { admin_id, tech_id, rrid } = req.body;
   try {
-    if(await checkDuplicatesAssignWork(rrid)){
-      return res.send('คำขอนี้มีการจ่ายงานไปแล้ว')
+    if (await checkDuplicatesAssignWork(rrid)) {
+      return res.send('คำขอนี้มีการจ่ายงานไปแล้ว');
     }
+    
     const result = await sequelize.transaction(async (t) => {
+      const fetchStatusData = await model.technicianStatus.findOne({
+        where: {
+          receive_request_status: 'UA',
+        },
+        transaction: t // เพิ่ม transaction ที่นี่ด้วย
+      });
+
       const assign = await model.assignWork.create({
         admin_id: admin_id,
         tech_id: tech_id,
@@ -23,56 +30,64 @@ assignRouter.post('/assign', async (req, res) => {
       const receive = await model.receiveRepair.create({
         tech_id: tech_id,
         rrid: rrid,
-      },{tracnsaction:t})
+      }, { transaction: t });
 
       const notificationTechnician = await model.notification.create({
         noti_message: `ได้รับมอบหมายงาน ${rrid}`,
-        tech_id: tech_id  // ตรงนี้ก็ต้องให้แน่ใจว่าส่งค่าที่ถูกต้อง
+        tech_id: tech_id
       }, { transaction: t });
 
       wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({
-            title:`ได้รับมอบหมายงาน`,
+            title: `ได้รับมอบหมายงาน`,
             message: `รหัสงาน:${rrid}`,
             user_id: tech_id,
-            role:"Technician",
+            role: "Technician",
             timestamp: new Date()
           }));
         }
       });
-      
-      const employeeFromRequest = await model.requestForRepair.findAll(
-        {
-          where:{rrid:rrid},
-          transaction: t
-        });
+
+      const employeeFromRequest = await model.requestForRepair.findAll({
+        where: { rrid: rrid },
+        transaction: t
+      });
 
       const notificationEmployee = await Promise.all(employeeFromRequest.map(items => {
         wss.clients.forEach(client => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({
-              title:`รับงาน`,
+              title: `รับงาน`,
               message: `คำขอ ${rrid} ได้มีคนรับงานแล้ว`,
               user_id: items.employee_id,
-              role:"Employee",
+              role: "Employee",
               timestamp: new Date()
             }));
           }
         });
         return model.notification.create({
           noti_message: `คำขอ ${rrid} ได้มีคนรับงานแล้ว`,
-          emp_id: items.employee_id  // ตรงนี้ก็ต้องให้แน่ใจว่าส่งค่าที่ถูกต้อง
+          emp_id: items.employee_id
         }, { transaction: t });
-      }))
-      // const notificationEmployee = await 
+      }));
+
+      const updateTechStatus = await model.technician.update(
+        { status_id: fetchStatusData.status_id },
+        {
+          where: { tech_id: tech_id },
+          transaction: t
+        }
+      );
+
       const updateStatusRequest = await model.requestForRepair.update({
-          request_status:"กำลังดำเนินการ"
-      },{
-        where:{rrid:rrid},
+        request_status: "กำลังดำเนินการ"
+      }, {
+        where: { rrid: rrid },
         transaction: t
-      })
-      return { message:"จ่ายงานสำเร็จ" };
+      });
+
+      return { message: "จ่ายงานสำเร็จ" };
     });
 
     res.status(201).json(result);
