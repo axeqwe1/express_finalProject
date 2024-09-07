@@ -8,6 +8,7 @@ module.exports = (sequelize) => {
     emp_id: { type: DataTypes.INTEGER, allowNull: true },
     tech_id:{type: DataTypes.INTEGER, allowNull: true  },
     timestamp: {type:DataTypes.DATE,allowNull:false,defaultValue: literal('CURRENT_TIMESTAMP')},
+    isRead:{type:DataTypes.BOOLEAN,allowNull:false,defaultValue:false}
   },{
     tableName: 'notifications',
     createdAt: false,

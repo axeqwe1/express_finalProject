@@ -55,22 +55,22 @@ requestRouter.post('/repair', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-requestRouter.put("/updateRequestData/:id", async (req, res) => {
-  try {
-      const rrid = parseInt(req.params.id);
-      const updatedRepairRequest = await model.requestForRepair.update(req.body, {
-          where: { rrid: rrid }
-      });
-      if (updatedRepairRequest[0] > 0) {
-          res.send('Request updated successfully');
-      } else {
-          res.status(404).send('RequestRepairData is not found');
-      }
-  } catch (error) {
-      console.error('Error updating RequestData:', error);
-      res.status(500).send('Server Error');
-  }
-});
+// requestRouter.put("/updateRequestData/:id", async (req, res) => {
+//   try {
+//       const rrid = parseInt(req.params.id);
+//       const updatedRepairRequest = await model.requestForRepair.update(req.body, {
+//           where: { rrid: rrid }
+//       });
+//       if (updatedRepairRequest[0] > 0) {
+//           res.send('Request updated successfully');
+//       } else {
+//           res.status(404).send('RequestRepairData is not found');
+//       }
+//   } catch (error) {
+//       console.error('Error updating RequestData:', error);
+//       res.status(500).send('Server Error');
+//   }
+// });
 requestRouter.get('/test', async (req, res) => {
     res.send('test')
 });

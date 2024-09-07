@@ -4,6 +4,7 @@ const model = require('../../db/associatation')
 const repairDetailRouter = express.Router();
 const WebSocket = require('ws');
 const wss = require('../../utils/WebSocketServer');
+const {Sequelize} = require('sequelize');
 
 repairDetailRouter.post('/addDetail', async (req, res) => {
   const { request_status } = req.body;
@@ -12,6 +13,8 @@ repairDetailRouter.post('/addDetail', async (req, res) => {
     await model.sequelize.transaction(async (t) => {
       // Create the repair detail
       const addDetail = await model.repairDetail.create(req.body, { transaction: t });
+      let totalCount = 0
+      let succCount = 0
 
       // Fetch the related receiveRepair and requestForRepair records
       const detail = await model.repairDetail.findByPk(addDetail.rd_id, {
@@ -27,7 +30,9 @@ repairDetailRouter.post('/addDetail', async (req, res) => {
         const reqRepair = detail.receive_repair.request_for_repair;
 
         // Update the request status
+
         const updatedRequest = await reqRepair.update({ request_status: request_status }, { transaction: t });
+
 
         // Create a notification
         await model.notification.create({
@@ -82,11 +87,37 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
 
       if (detail) {
         const reqRepair = detail.receive_repair.request_for_repair;
+        const techId = detail.receive_repair.tech_id
         checkStatusRequest = await reqRepair.update({ request_status: request_status }, { transaction: t });
         await model.notification.create({
           noti_message: `มีการอัพเดทสถานะงาน: ${reqRepair.request_status}`,
           emp_id: reqRepair.employee_id
         }, { transaction: t });
+        const backlog = await fetchBacklogTech(techId)
+        console.log(backlog)
+        if(backlog < 1){
+          const idStatus = await model.technicianStatus.findOne({
+            where: {
+              receive_request_status: 'A'
+            },
+            attributes: ['id'] // ดึงเฉพาะฟิลด์ 'id'
+          });
+          
+          if (idStatus) {
+            console.log(idStatus.id); // แสดงเฉพาะค่า id
+            await model.technician.update({
+              status_id:idStatus.id
+            },
+            {
+              where:{
+                tech_id:techId
+              }
+            }, { transaction: t })
+          } else {
+            console.log('No matching record found');
+          }
+
+        }
         wss.clients.forEach(client => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({
@@ -119,4 +150,42 @@ repairDetailRouter.get('/test', async (req, res) => {
     res.send('test')
 });
 
+const fetchBacklogTech = async (techId) =>{
+          // fetch จำนวนการรับงาน
+          const count = await model.receiveRepair.findAll({
+            where:{tech_id:techId},
+            attributes:[[Sequelize.fn('COUNT',Sequelize.col('receive_repair.rrid')),'receive']]
+        })
+  
+          const successCount = await model.requestForRepair.findAll({
+            where:{
+                request_status:'ส่งคืนเสร็จสิ้น'
+            },
+            include:[{
+                model:model.receiveRepair,
+                required:true,
+                where:{tech_id:techId},
+                attributes:[]
+            }],
+            attributes:[
+                [Sequelize.fn('COUNT',Sequelize.col('request_for_repair.rrid')),'successWork'],
+            ],
+            group:[`receive_repair.tech_id`]
+        })
+          // ตรวจข้อมูลใน array ว่ามีข้อมูลหรือเปล่า --> จำนวนงานทั้งหมด
+          if(!count[0]){
+            totalCount = 0
+          }else{
+                totalCount = parseInt(count[0].dataValues.receive)
+          }
+          // ตรวจข้อมูลใน array ว่ามีข้อมูลหรือเปล่า --> จำนวนงานที่ทำเสร็จ
+          if(!successCount[0]){
+                succCount = 0
+          }else{
+                succCount = parseInt(successCount[0].dataValues.successWork)
+          }
+          const Backlog = totalCount - succCount
+
+          return Backlog
+}
 module.exports = repairDetailRouter;
