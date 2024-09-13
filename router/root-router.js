@@ -45,7 +45,8 @@ const router = {
     upload:
         {
             uploadImage:require('./upload')
-        }
+        },
+        
 }
 
 module.exports = router

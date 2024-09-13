@@ -45,14 +45,10 @@ techStatusRouter.post("/addtechstatus", async (req, res) => {
 techStatusRouter.put("/updatetechstatus/:id", async (req, res) => {
     try {
         const status_id = parseInt(req.params.id);
-        const updatedTechnician = await techStatus.update(req.body, {
+        const updatedTechnicianStatus = await techStatus.update(req.body, {
             where: { status_id: status_id }
         });
-        if (updatedTechnician[0] > 0) {
-            res.send('Technician updated successfully');
-        } else {
-
-        }
+        res.send('Technician status updated successfully');
     } catch (error) {
         console.error('Error updating technician:', error);
         res.status(500).send('Server Error');

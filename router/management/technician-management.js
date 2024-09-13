@@ -3,6 +3,7 @@ const sequelize = require('../../db/config/sequelizeConfig');
 const technic = require('../../db/model/technician')(sequelize);
 const technicRouter = express.Router();
 const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
+const {sendCreateEmail,sendUpdateEmail} = require('../../utils/Mailer')
 // GET all technicians
 technicRouter.get("/gettechnicians", async (req, res) => {
     try {
@@ -30,7 +31,7 @@ technicRouter.get("/gettechnician/:id", async (req, res) => {
 });
 // POST new technician
 technicRouter.post("/addtechnician", async (req, res) => {
-    const {firstname,lastname,phone,email} = req.body
+    const {firstname,lastname,phone,email,password} = req.body
     try {
         if (await checkDuplicatesEmailPhone(email,phone)){
             return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
@@ -39,6 +40,7 @@ technicRouter.post("/addtechnician", async (req, res) => {
             return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
         }
         const newTechnician = await technic.create(req.body);
+        sendCreateEmail(email,`${firstname} ${lastname}`,password)
         res.status(201).json(newTechnician);
     } catch (error) {
         console.error('Error adding technician:', error);
@@ -47,17 +49,14 @@ technicRouter.post("/addtechnician", async (req, res) => {
 });
 // PUT update technician
 technicRouter.put("/updatetechnician/:id", async (req, res) => {
-    const {firstname,lastname,phone,email} = req.body
+    const {firstname,lastname,phone,email,password} = req.body
     try {
         const technicianId = parseInt(req.params.id);
         const updatedTechnician = await technic.update(req.body, {
             where: { tech_id: technicianId }
         });
-        if (updatedTechnician[0] > 0) {
-            res.send('Technician updated successfully');
-        } else {
-            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
-        }
+        sendUpdateEmail(email,`${firstname} ${lastname}`,password)
+        res.send('Technician updated successfully');
     } catch (error) {
         console.error('Error updating technician:', error);
         res.status(500).send('Server Error');

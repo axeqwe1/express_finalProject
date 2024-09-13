@@ -3,7 +3,7 @@ const sequelize = require('../../db/config/sequelizeConfig');
 const admin = require('../../db/model/admin')(sequelize);
 const adminRouter = express.Router();
 const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
-
+const {sendCreateEmail,sendUpdateEmail} = require('../../utils/Mailer')
 // GET all admins
 adminRouter.get("/getadmins", async (req, res) => {
     try {
@@ -33,7 +33,7 @@ adminRouter.get("/getadmin/:id", async (req, res) => {
 
 // POST new admin
 adminRouter.post("/addadmin", async (req, res) => {
-    const {firstname,lastname,phone,email} = req.body
+    const {firstname,lastname,phone,email,password} = req.body
     try {
         if (await checkDuplicatesEmailPhone(email,phone)){
             return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
@@ -42,6 +42,7 @@ adminRouter.post("/addadmin", async (req, res) => {
             return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
         }
         const newAdmin = await admin.create(req.body);
+        sendCreateEmail(email,`${firstname} ${lastname}`,password)
         res.status(201).json(newAdmin);
     } catch (error) {
         console.error('Error adding admin:', error);
@@ -51,17 +52,15 @@ adminRouter.post("/addadmin", async (req, res) => {
 
 // PUT update admin
 adminRouter.put("/updateadmin/:id", async (req, res) => {
-    const {firstname,lastname,phone,email} = req.body
+    const {firstname,lastname,phone,email,password} = req.body
     try {
         const adminId = parseInt(req.params.id);
         const updatedAdmin = await admin.update(req.body, {
             where: { admin_id: adminId }
         });
-        if (updatedAdmin[0] > 0) {
-            res.send('Admin updated successfully');
-        } else {
-            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
-        }
+        sendUpdateEmail(email,`${firstname} ${lastname}`,password)
+        res.send('Admin updated successfully');
+
     } catch (error) {
         console.error('Error updating admin:', error);
         res.status(500).send('Server Error');

@@ -22,6 +22,17 @@ requestRouter.post('/repair', async (req, res) => {
         eq_id: equipmentId
       }, { transaction: t });
 
+      // อัปเดตสถานะอุปกรณ์
+      await model.equipment.update(
+        {
+          eq_status:"ส่งซ่อม"
+        },
+        {
+          where:{
+            eq_id:equipmentId
+          },
+          transaction: t
+        })
       // ดึงข้อมูล Admin ทั้งหมด
       const admins = await Admin.findAll({ transaction: t });
 
@@ -45,7 +56,6 @@ requestRouter.post('/repair', async (req, res) => {
         }, { transaction: t })
   
       }));
-
       return { repair, notifications };
     });
 

@@ -48,11 +48,7 @@ equipmentRouter.put("/updateequipment/:id", async (req, res) => {
         const updatedEquipment = await equipment.update(req.body, {
             where: { eq_id: equipmentId }
         });
-        if (updatedEquipment[0] > 0) {
-            res.send('Equipment updated successfully');
-        } else {
-
-        }
+        res.send('Equipment updated successfully');
     } catch (error) {
         console.error('Error updating equipment:', error);
         res.status(500).send('Server Error');

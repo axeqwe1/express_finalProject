@@ -48,11 +48,7 @@ loedRouter.put("/updateloed/:id", async (req, res) => {
         const updatedLoed = await loed.update(req.body, {
             where: { loed_id: loedId }
         });
-        if (updatedLoed[0] > 0) {
-            res.send('Loed updated successfully');
-        } else {
-
-        }
+        res.send('Loed updated successfully');
     } catch (error) {
         console.error('Error updating loed:', error);
         res.status(500).send('Server Error');

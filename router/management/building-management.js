@@ -48,11 +48,7 @@ buildingRouter.put("/updatebuilding/:id", async (req, res) => {
         const updatedBuilding = await building.update(req.body, {
             where: { building_id: buildingId }
         });
-        if (updatedBuilding[0] > 0) {
-            res.send('Building updated successfully');
-        } else {
-
-        }
+        res.send('Building updated successfully');
     } catch (error) {
         console.error('Error updating building:', error);
         res.status(500).send('Server Error');

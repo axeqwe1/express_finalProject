@@ -3,6 +3,7 @@ const sequelize = require('../../db/config/sequelizeConfig');
 const employee = require('../../db/model/employee')(sequelize); // Assuming this represents an employee model
 const employeeRouter = express.Router();
 const { checkDuplicatesEmailPhone, checkDuplicatesName } = require('../../utils/validation');
+const {sendCreateEmail,sendUpdateEmail} = require('../../utils/Mailer')
 // GET all employees
 employeeRouter.get("/getemployees", async (req, res) => {
     try {
@@ -32,7 +33,7 @@ employeeRouter.get("/getemployee/:id", async (req, res) => {
 
 // POST a new employee
 employeeRouter.post("/addemployee", async (req, res) => {
-    const {firstname,lastname,phone,email} = req.body
+    const {firstname,lastname,phone,email,password} = req.body
     try {
         if (await checkDuplicatesEmailPhone(email,phone)){
             return res.status(400).send('Email หรือ เบอร์โทร มีอยู่ในระบบแล้ว')
@@ -41,6 +42,7 @@ employeeRouter.post("/addemployee", async (req, res) => {
             return res.status(400).send('ชื่อ-นามสกุล มีอยู่ในระบบแล้ว')
         }
         const newEmployee = await employee.create(req.body);
+        sendCreateEmail(email,`${firstname} ${lastname}`,password)
         res.status(201).json(newEmployee);
     } catch (error) {
         console.error('Error adding employee:', error);
@@ -50,17 +52,14 @@ employeeRouter.post("/addemployee", async (req, res) => {
 
 // PUT to update an employee
 employeeRouter.put("/updateemployee/:id", async (req, res) => {
-    const {firstname,lastname,phone,email} = req.body
+    const {firstname,lastname,phone,email,password} = req.body
     try {
         const employeeId = parseInt(req.params.id);
         const updatedEmployee = await employee.update(req.body, {
             where: { emp_id: employeeId }
         });
-        if (updatedEmployee[0] > 0) {
-            res.send('Employee updated successfully');
-        } else {
-            // res.status(404).send('ข้อมูลแก้ไขซ้ำกับข้อมูลเก่าหรือไม่พบข้อมูลของผู้แก้ไขข้อมูล');
-        }
+        sendUpdateEmail(email,`${firstname} ${lastname}`,password)
+        res.send('Technician updated successfully');
     } catch (error) {
         console.error('Error updating employee:', error);
         res.status(500).send('Server Error');

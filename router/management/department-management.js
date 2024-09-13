@@ -48,11 +48,7 @@ departmentRouter.put("/updatedepartment/:id", async (req, res) => {
         const updatedDepartment = await department.update(req.body, {
             where: { department_id: departmentId } // Make sure to use the correct column name for the department's ID.
         });
-        if (updatedDepartment[0] > 0) {
-            res.send('Department updated successfully');
-        } else {
-
-        }
+        res.send('Department updated successfully');
     } catch (error) {
         console.error('Error updating department:', error);
         res.status(500).send('Server Error');
