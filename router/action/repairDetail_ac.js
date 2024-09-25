@@ -172,7 +172,7 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
             }));
           }
         });
-      }
+      
 
       // Update repair detail
       const updatedDetail = await model.repairDetail.update(req.body, {
@@ -205,13 +205,15 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
             transaction: t
           })
       }
-
       // Check if updates were successful
       if (updatedDetail[0] > 0 || checkStatusRequest) {
         res.json({ message: 'Detail updated successfully' });
       } else {
         res.status(404).send('Detail Data is not found');
       }
+    }else {
+      throw new Error('Related receiveRepair or requestForRepair not found');
+    }
     }).then(async () => {
       // Fetch the repair detail with related receiveRepair and requestForRepair
       const detail = await model.repairDetail.findByPk(detail_id, {
