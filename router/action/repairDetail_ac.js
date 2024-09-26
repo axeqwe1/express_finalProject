@@ -55,6 +55,7 @@ repairDetailRouter.post('/addDetail', async (req, res) => {
               transaction: t
             })
         }
+        
         // Update the request status
         const updatedRequest = await reqRepair.update({ request_status: request_status }, { transaction: t });
 
@@ -147,7 +148,7 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
         console.error('Error fetching detail:', err);
         throw err;  // Rethrow the error to be caught by the outer try/catch
       });
-
+      console.log(`test detail id ${detail_id}`)
       if (detail) {
         const reqRepair = detail.receive_repair.request_for_repair;
 
@@ -156,7 +157,7 @@ repairDetailRouter.put("/updateDetail/:id", async (req, res) => {
 
         // Create a notification
         await model.notification.create({
-          noti_message: `มีการอัพเดทสถานะงาน: ${reqRepair.request_status}`,
+          noti_message: `คำขอ ${reqRepair.rrid} มีการอัพเดทสถานะงาน: ${reqRepair.request_status}`,
           emp_id: reqRepair.employee_id
         }, { transaction: t });
 

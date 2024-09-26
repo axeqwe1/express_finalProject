@@ -19,8 +19,11 @@ requestRouter.post('/repair', async (req, res) => {
     if (!equipment) {
       return res.status(404).send( 'ไม่พบข้อมูลอุปกรณ์' );
     }
-    else if (equipment.eq_status != 'กำลังใช้งาน') {
+    else if (equipment.eq_status == 'ส่งซ่อม') {
       return res.status(400).send('อุปกรณ์ไม่สามารถแจ้งซ่อมได้เนื่องจากมีการแจ้งซ่อมอุปกรณ์นี้ในระบบแล้ว' );
+    }
+    else if (equipment.eq_status == 'เสียซ่อมไม่ได้'){
+      return res.status(400).send('อุปกรณ์ไม่สามารถแจ้งซ่อมได้เนื่องจากมีการแจ้งซ่อมแล้วอุปกรณ์ไม่สามารถซ่อมได้');
     }else{
       await sequelize.transaction(async (t) => {
         const repair = await model.requestForRepair.create({
@@ -76,22 +79,7 @@ requestRouter.post('/repair', async (req, res) => {
   }
 });
 
-// requestRouter.put("/updateRequestData/:id", async (req, res) => {
-//   try {
-//       const rrid = parseInt(req.params.id);
-//       const updatedRepairRequest = await model.requestForRepair.update(req.body, {
-//           where: { rrid: rrid }
-//       });
-//       if (updatedRepairRequest[0] > 0) {
-//           res.send('Request updated successfully');
-//       } else {
-//           res.status(404).send('RequestRepairData is not found');
-//       }
-//   } catch (error) {
-//       console.error('Error updating RequestData:', error);
-//       res.status(500).send('Server Error');
-//   }
-// });
+
 requestRouter.get('/test', async (req, res) => {
     res.send('test')
 });
