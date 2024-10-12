@@ -29,6 +29,20 @@ services:
     networks:
       - my_network
 
+  app:  # แก้ไขให้ใช้ชื่อ service ที่ถูกต้อง เช่น 'app'
+    image: node:latest  # ใช้ Node.js Docker Image ล่าสุด
+    container_name: node_app_finalProject
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app  # Mount ไฟล์ทั้งหมดในโฟลเดอร์ปัจจุบันไปยัง container
+    command: npm run dev  # รันคำสั่ง npm
+    ports:
+      - "3000:3000"  # เปิดพอร์ตสำหรับ Node.js (ปรับตามแอปของคุณ)
+    depends_on:
+      - db
+    networks:
+      - my_network
+
 networks:
   my_network:
     driver: bridge
