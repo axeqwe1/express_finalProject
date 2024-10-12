@@ -37,7 +37,7 @@ services:
       - .:/usr/src/app  # Mount ไฟล์ทั้งหมดในโฟลเดอร์ปัจจุบันไปยัง container
     command: npm run dev  # รันคำสั่ง npm
     ports:
-      - "3000:3000"  # เปิดพอร์ตสำหรับ Node.js (ปรับตามแอปของคุณ)
+      - "8000:8000"  # เปิดพอร์ตสำหรับ Node.js (ปรับตามแอปของคุณ)
     depends_on:
       - db
     networks:
