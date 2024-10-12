@@ -18,8 +18,8 @@ async function sendCreateEmail(userEmail, username, password) {
         from: 'your-email@gmail.com',
         to: userEmail,
         subject: 'Welcome to Our Service',
-        text: `Hello ${username},\n\nYour account has been created successfully.\n\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you!`,
-        html: `<h1>Welcome, ${username}!</h1><p>Your account has been created successfully.</p><p><strong>Username:</strong> ${username}<br><strong>Password:</strong> ${password}</p><p>Please keep your credentials secure.</p><p>Thank you!</p>`
+        text: `Hello ${username},\n\nYour account has been created successfully.\n\nUsername: ${userEmail}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you!`,
+        html: `<h1>Welcome, ${username}!</h1><p>Your account has been created successfully.</p><p><strong>Username:</strong> ${userEmail}<br><strong>Password:</strong> ${password}</p><p>Please keep your credentials secure.</p><p>Thank you!</p>`
       };
   
       // ส่งอีเมล
@@ -44,8 +44,8 @@ async function sendCreateEmail(userEmail, username, password) {
         from: 'your-email@gmail.com',
         to: userEmail,
         subject: 'Welcome to Our Service',
-        text: `Hello ${username},\n\nYour account has been created successfully.\n\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you!`,
-        html: `<h1>Welcome, ${username}!</h1><p>Your account has been Updated successfully.</p><p><strong>Username:</strong> ${username}<br><strong>Password:</strong> ${password}</p><p>Please keep your credentials secure.</p><p>Thank you!</p>`
+        text: `Hello ${username},\n\nYour account has been created successfully.\n\nUsername: ${userEmail}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you!`,
+        html: `<h1>Welcome, ${username}!</h1><p>Your account has been Updated successfully.</p><p><strong>Username:</strong> ${userEmail}<br><strong>Password:</strong> ${password}</p><p>Please keep your credentials secure.</p><p>Thank you!</p>`
       };
   
       // ส่งอีเมล

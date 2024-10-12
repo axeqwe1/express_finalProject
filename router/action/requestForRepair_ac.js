@@ -14,7 +14,6 @@ requestRouter.post('/repair', async (req, res) => {
   try {
     // ตรวจสอบสถานะอุปกรณ์ก่อนที่จะดำเนินการแจ้งซ่อม
     const equipment = await model.equipment.findByPk(equipmentId);
-
     console.log(`equipment status is ${equipment.eq_status}`)
     if (!equipment) {
       return res.status(404).send( 'ไม่พบข้อมูลอุปกรณ์' );
@@ -64,7 +63,7 @@ requestRouter.post('/repair', async (req, res) => {
           });
   
           return model.notification.create({
-            noti_message: `New repair request created: ${description}`,
+            noti_message: `มีคำขอแจ้งซ่อมเข้าสู่ระบบ: ${description}`,
             admin_id: items.admin_id  // ตรวจสอบว่าชื่อฟิลด์ในโมเดล Notification คือ admin_id
           }, { transaction: t });
         }));

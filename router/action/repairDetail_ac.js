@@ -14,7 +14,7 @@ repairDetailRouter.post('/addDetail', async (req, res) => {
     await model.sequelize.transaction(async (t) => {
       // Create the repair detail
       const addDetail = await model.repairDetail.create(req.body, { transaction: t });
-      rd_id = addDetail.rd_id
+
       // Fetch the related receiveRepair and requestForRepair records
       const detail = await model.repairDetail.findByPk(addDetail.rd_id, {
         include: [{
