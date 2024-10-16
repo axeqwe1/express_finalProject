@@ -1,18 +1,21 @@
 version: "3.7"
 
 services:
-  db:
-    image: mysql:5.7
-    container_name: mysql_db_finalProject
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: repaircomputer_db
-    ports:
-      - "8006:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - my_network
+db:
+  image: mysql:5.7
+  container_name: mysql_db_finalProject
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: repaircomputer_db
+    # ตั้งค่าให้ MySQL ใช้ utf8mb4
+    MYSQL_CHARSET: utf8mb4
+  ports:
+    - "8006:3306"
+  volumes:
+    - mysql_data:/var/lib/mysql
+  networks:
+    - my_network
+  command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
