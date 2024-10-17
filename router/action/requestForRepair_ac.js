@@ -54,7 +54,7 @@ requestRouter.post('/repair', async (req, res) => {
             if (client.readyState === WebSocket.OPEN) {
               client.send(JSON.stringify({
                 title:`มีคำขอเข้าสู่ระบบ`,
-                message: `มีคำขอการแจ้งซ่อมเข้าสู่ระบบ:${description}.`,
+                message: `มีคำขอการแจ้งซ่อมเข้าสู่ระบบ คำขอ${repair.rrid}: ${description}.`,
                 user_id: items.admin_id,
                 role:"Admin",
                 timestamp: new Date()
@@ -63,7 +63,7 @@ requestRouter.post('/repair', async (req, res) => {
           });
   
           return model.notification.create({
-            noti_message: `มีคำขอแจ้งซ่อมเข้าสู่ระบบ: ${description}`,
+            noti_message: `มีคำขอแจ้งซ่อมเข้าสู่ระบบ คำขอ${repair.rrid}: ${description}`,
             admin_id: items.admin_id  // ตรวจสอบว่าชื่อฟิลด์ในโมเดล Notification คือ admin_id
           }, { transaction: t });
         }));
