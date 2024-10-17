@@ -187,6 +187,9 @@ router.get('/request/:id',async (req,res) => {
                         },
                         {
                             model:model.building
+                        },
+                        {
+                            model:model.assignWork
                         }
                 ]
                 });
