@@ -70,7 +70,7 @@ app.use('/report',router.reports.export_report)
 app.get('/check_connection', (req, res) => {
   res.status(200).json({ success: true });
 });
-app.listen(port, async () => {
+app.listen(port, '0.0.0.0' ,async () => {
   await connectAndCreateDb()
   console.log("Server started at port 8000");
 });
