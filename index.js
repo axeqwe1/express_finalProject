@@ -7,9 +7,7 @@ const port = 8000;
 const { parse } = require('json2csv');
 const { connectAndCreateDb } = require('./db/index.js')
 const router = require('./router/root-router.js')
-require('./utils/WebSocketServer.js')
 require('./utils/scheduleTask.js') // run task for check
-const WebSocket = require('ws');  // WebSocket Server
 app.use(express.json());
 app.use(cors())
 sessionConfig(app);

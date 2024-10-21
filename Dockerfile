@@ -12,6 +12,6 @@ RUN npm install -g nodemon
 COPY . .
 
 EXPOSE 8000
-EXPOSE 8001  
+EXPOSE 80  
 # เพิ่มการ Expose พอร์ต 8001
 CMD ["npm", "run", "dev"]
