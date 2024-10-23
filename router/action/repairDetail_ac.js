@@ -54,6 +54,18 @@ repairDetailRouter.post('/addDetail', async (req, res) => {
               },
               transaction: t
             })
+        }else if (request_status == "กำลังส่งคืน"){
+          console.log("IsUpdate กำลังส่งคืน")
+          await model.equipment.update(
+            {
+              eq_status:"พร้อมใช้งาน"
+            },
+            {
+              where:{
+                eq_id:reqRepair.eq_id
+              },
+              transaction: t
+            })
         }
         
         // Update the request status
