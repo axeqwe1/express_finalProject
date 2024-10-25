@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({
-    port: 80
+    port: 80,
+    perMessageDeflate: false,  // ปิดการบีบอัด
   });
 
 
