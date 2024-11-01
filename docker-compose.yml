@@ -7,7 +7,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: repaircomputer_db
-      # ตั้งค่าให้ MySQL ใช้ utf8mb4
       MYSQL_CHARSET: utf8mb4
     ports:
       - "8006:3306"
@@ -38,9 +37,10 @@ services:
     container_name: node_app_finalProject
     volumes:
       - .:/usr/src/app  # Mount ไฟล์ทั้งหมดในโฟลเดอร์ปัจจุบันไปยัง container
+      - image_data:/usr/src/app/images  # สร้าง Volume สำหรับเก็บรูปภาพ
     ports:
       - "8000:8000"
-      - "80:80"  # เปิดพอร์ต 8001 สำหรับ WebSocket Server
+      - "80:80"  # เปิดพอร์ต 80
     depends_on:
       - db
     networks:
@@ -53,3 +53,5 @@ networks:
 volumes:
   mysql_data:
     driver: local
+  image_data:
+    driver: local  # Volume สำหรับเก็บรูปภาพ
