@@ -51,7 +51,6 @@ const checkOverdueRequests = async () => {
           await model.notification.create({
             noti_message: `คำขอ ${request.rrid} เกินกำหนดและยังไม่มีผู้รับงาน.`,
             admin_id: admin.admin_id,
-            timestamp: new Date(),
           });
 
           // ส่งข้อความแจ้งเตือนผ่าน WebSocket
