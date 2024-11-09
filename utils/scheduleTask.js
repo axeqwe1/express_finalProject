@@ -75,4 +75,6 @@ const checkOverdueRequests = async () => {
 };
 
 // กำหนดเวลางานให้ทำงานทุกวัน
-cron.schedule('0 0 * * *', checkOverdueRequests);
+cron.schedule('0 0 * * *', checkOverdueRequests, {
+  timezone: "Asia/Bangkok"
+});;
