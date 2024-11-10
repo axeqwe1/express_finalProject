@@ -13,5 +13,5 @@ COPY . .
 
 EXPOSE 8000
 EXPOSE 80  
-# เพิ่มการ Expose พอร์ต 8001
-CMD ["npm", "run", "dev"]
+
+CMD ["npm", "start"]
